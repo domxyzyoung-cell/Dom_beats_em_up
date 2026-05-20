@@ -2,51 +2,107 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Dom beats them up.</title>
     <style>
         * {
-            box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0;
+            box-sizing: border-box; 
+            user-select: none; 
+            -webkit-user-select: none; 
+            margin: 0; 
+            padding: 0;
+            touch-action: none;
         }
         body {
-            background-color: #0b0b12; font-family: 'Courier New', Courier, monospace; color: #fff;
-            overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;
-        }
-        #game-container {
-            position: relative; width: 800px; height: 400px;
-            background: linear-gradient(to bottom, #111424 0%, #1d213a 60%, #08090f 100%);
-            border: 4px solid #444; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            background-color: #050508; 
+            font-family: 'Courier New', Courier, monospace; 
+            color: #fff;
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh;
+            width: 100vw;
         }
         
-        /* Screens configuration */
+        /* Dynamic Axis Scaling for Cross-Device Viewports */
+        #canvas-scaler {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-origin: center center;
+            transition: transform 0.1s ease-out;
+        }
+
+        #game-container {
+            position: relative; 
+            width: 800px; 
+            height: 400px;
+            background: linear-gradient(to bottom, #111424 0%, #1d213a 60%, #08090f 100%);
+            border: 4px solid #444; 
+            overflow: hidden; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+        }
+        
+        /* Structural Navigation Screen Matrix */
         .screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(8, 8, 14, 0.96); z-index: 20;
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            background: rgba(8, 8, 14, 0.96); 
+            z-index: 20;
         }
         .hidden { display: none !important; }
         
         h1 {
-            font-size: 3.2rem; color: #ff2a35; text-shadow: 0 0 15px rgba(255,42,53,0.7);
-            margin-bottom: 20px; text-transform: uppercase; letter-spacing: 3px; font-weight: 900; text-align: center;
+            font-size: 3.2rem; 
+            color: #ff2a35; 
+            text-shadow: 0 0 15px rgba(255,42,53,0.7);
+            margin-bottom: 20px; 
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+            font-weight: 900; 
+            text-align: center;
         }
         h2 { font-size: 1.6rem; color: #ffd700; margin-bottom: 20px; }
         .menu-group { display: flex; flex-direction: column; gap: 15px; width: 300px; }
         .char-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; max-width: 600px; }
         
         button {
-            padding: 14px 20px; font-size: 1.2rem; font-family: inherit; background: #1a1a26;
-            color: #fff; border: 2px solid #555; cursor: pointer; transition: all 0.2s; text-transform: uppercase;
-            font-weight: bold; border-radius: 4px;
+            padding: 14px 20px; 
+            font-size: 1.2rem; 
+            font-family: inherit; 
+            background: #1a1a26;
+            color: #fff; 
+            border: 2px solid #555; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            text-transform: uppercase;
+            font-weight: bold; 
+            border-radius: 4px;
         }
-        button:hover { background: #ff2a35; border-color: #fff; box-shadow: 0 0 15px rgba(255,42,53,0.6); }
+        button:hover, button:active { background: #ff2a35; border-color: #fff; box-shadow: 0 0 15px rgba(255,42,53,0.6); }
         .char-btn { font-size: 1rem; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 5px;}
         .char-btn span { font-size: 24px; }
         
-        /* HUD UI */
+        /* HUD Interface Blueprint */
         #hud {
-            position: absolute; top: 0; left: 0; width: 100%; padding: 15px;
-            display: flex; justify-content: space-between; align-items: center; z-index: 5;
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            padding: 15px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            z-index: 5;
         }
         .health-bar-container { width: 36%; height: 24px; background: #222; border: 2px solid #fff; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .health-fill { height: 100%; width: 100%; background: #2ecc71; transition: width 0.05s ease-out; }
@@ -56,15 +112,26 @@
         #match-stats { text-align: center; font-size: 1.5rem; font-weight: bold; text-shadow: 0 2px 4px #000; }
         #level-badge { color: #ffd700; font-size: 0.9rem; display: block; margin-top: 2px; }
 
-        /* Fighter Base Dynamics */
+        /* Fighter Spatial Node Container */
         .fighter {
-            position: absolute; bottom: 20px; width: 90px; height: 130px;
-            transition: transform 0.02s linear; transform-origin: bottom center;
+            position: absolute; 
+            bottom: 20px; 
+            width: 90px; 
+            height: 130px;
+            transform-origin: bottom center;
         }
-        .sprite { position: relative; width: 100%; height: 100%; }
-        #enemy .sprite { transform: scaleX(-1); }
+        
+        /* Isolated Scaling Vector to Prevent Transformation Clamping */
+        .sprite { 
+            position: relative; 
+            width: 100%; 
+            height: 100%; 
+            transform: scale(var(--c-scale, 1));
+            transform-origin: bottom center;
+        }
+        #enemy .sprite { transform: scaleX(-1) scale(var(--c-scale, 1)); }
 
-        /* Anatomy base elements */
+        /* Anatomy Anchors */
         .head {
             position: absolute; top: 12px; left: 30px; width: 30px; height: 30px;
             border-radius: 50%; border: 3px solid var(--char-color); background: #111; z-index: 3;
@@ -75,68 +142,107 @@
         .torso {
             position: absolute; top: 42px; left: 43px; width: var(--torso-width, 6px); height: 42px;
             background: var(--torso-color, var(--char-color)); z-index: 2; border-radius: 3px;
-            display: flex; align-items: center; justify-content: center;
         }
         
         .arm {
-            position: absolute; top: 46px; left: 44px; width: var(--arm-width, 38px); height: 5px;
+            position: absolute; top: 4px; left: 50%; width: var(--arm-width, 38px); height: 5px;
             background: var(--char-color); transform-origin: left center; z-index: 4;
             transition: transform 0.08s, width 0.08s; border-radius: 3px;
         }
-        .arm-left { transform: rotate(140deg); }
-        .arm-right { transform: rotate(40deg); }
+        .arm-left { transform: translateX(-50%) rotate(140deg); }
+        .arm-right { transform: translateX(-50%) rotate(40deg); }
         
         .leg {
-            position: absolute; top: 82px; left: 44px; width: 44px; height: 5px;
+            position: absolute; top: 40px; left: 50%; width: 44px; height: 5px;
             background: var(--char-color); transform-origin: left center; z-index: 1;
             transition: transform 0.08s; border-radius: 3px;
         }
-        .leg-left { transform: rotate(105deg); }
-        .leg-right { transform: rotate(75deg); }
+        .leg-left { transform: translateX(-50%) rotate(105deg); }
+        .leg-right { transform: translateX(-50%) rotate(75deg); }
 
-        /* --- CHARACTER SPECIFIC ACCESSORIES --- */
-        /* Universal Hidden state */
+        /* Accessory Configuration Nodes */
         .accessory { display: none; position: absolute; }
 
-        /* Speedways (Teacher) */
+        /* Speedways Profile */
+        .theme-speedways { --c-scale: 1.0; }
         .theme-speedways .acc-hat { display: block; top: -5px; left: -5px; width: 36px; height: 6px; background: #000; border-radius: 1px; z-index: 5;}
         .theme-speedways .acc-hat::after { content:''; position: absolute; top: -8px; left: 6px; border-bottom: 8px solid #000; border-left: 12px solid transparent; border-right: 12px solid transparent;}
         
-        /* Lee (Ninja Player) */
+        /* Lee Profile (Horizontal Ninja Sash Refactor) */
+        .theme-lee { --c-scale: 1.0; }
         .theme-lee .acc-mask { display: block; top: 4px; left: -2px; width: 34px; height: 12px; background: #e51b24; z-index: 4; opacity: 0.9;}
-        .theme-lee .torso { background: #111; border-left: 3px solid #e51b24; } /* Red Sash */
+        .theme-lee .torso { background: linear-gradient(to bottom, #111 38%, #e51b24 38%, #e51b24 62%, #111 62%); } 
 
-        /* Dom (Muscular Italian) */
-        .theme-dom { transform-origin: bottom center; transform: scale(1.15) !important; }
+        /* Dom Profile (Dynamic CSS Scaling Hook) */
+        .theme-dom { --c-scale: 1.15; }
         .theme-dom .torso { width: 12px; background: linear-gradient(to bottom, #008C45 33%, #F4F5F0 33%, #F4F5F0 66%, #CD212A 66%); }
         .theme-dom .arm { width: 42px; height: 7px; }
 
-        /* Spaniard (Short Spanish) */
-        .theme-spaniard { transform-origin: bottom center; transform: scale(0.65) !important; }
+        /* Spaniard Profile (Dynamic CSS Scaling Hook) */
+        .theme-spaniard { --c-scale: 0.65; }
         .theme-spaniard .torso { width: 10px; background: linear-gradient(to bottom, #AA151B 25%, #F1BF00 25%, #F1BF00 75%, #AA151B 75%); }
 
-        /* Catterson (Celtic) */
-        .theme-catterson .acc-clover { display: block; top: 10px; left: -8px; color: #008000; font-size: 20px; text-shadow: 0 0 2px #fff; }
+        /* Catterson Profile */
+        .theme-catterson { --c-scale: 1.0; }
+        .theme-catterson .acc-clover { display: block; top: 8px; left: -10px; color: #008000; font-size: 20px; text-shadow: 0 0 2px #fff; width: 20px; height: 20px;}
 
-        /* Jeff (Racer) */
+        /* Jeff Profile */
+        .theme-jeff { --c-scale: 1.0; }
         .theme-jeff .head { width: 36px; height: 36px; top: 9px; left: 27px; background: #222; border-color: #111; }
         .theme-jeff .acc-visor { display: block; top: 8px; left: 14px; width: 18px; height: 10px; background: #111; border: 1px solid #444; border-radius: 2px; }
 
-        /* Enemies */
-        .theme-angel .halo, .theme-angel .wings { display: block; --wing-color: #fff; }
+        /* Wing Geometry & Tracking */
+        .wings { 
+            display: none; 
+            position: absolute; 
+            top: 2px; 
+            left: 50%;
+            transform: translateX(-50%); 
+            width: 90px; 
+            height: 30px; 
+            pointer-events: none;
+            z-index: -1;
+        }
+        .wing-l, .wing-r { 
+            position: absolute; 
+            width: 45px; 
+            height: 25px; 
+            background: var(--wing-color, #fff); 
+            border-radius: 20px 40px 10px 30px; 
+            opacity: 0.85;
+            box-shadow: 0 0 8px var(--wing-color, #fff);
+        }
+        .wing-l { right: 50%; transform-origin: right center; transform: rotate(15deg); }
+        .wing-r { left: 50%; transform-origin: left center; transform: scaleX(-1) rotate(15deg); }
+
+        /* Boss Character Themes */
+        .theme-angel { --c-scale: 1.0; }
+        .theme-angel .halo, .theme-angel .wings { display: block; --wing-color: #ffffff; }
+        
+        .theme-ninja-enemy { --c-scale: 1.0; }
         .theme-ninja-enemy .acc-mask { display: block; background: #00f3ff; }
-        .theme-devil .horns, .theme-devil .wings { display: block; --wing-color: #500; }
+        
+        /* Devil Refactor (Purple Skin, Absolute Horn Spacing alignment) */
+        .theme-devil { --c-scale: 1.25; --char-color: #800080; }
+        .theme-devil .horns, .theme-devil .wings { display: flex !important; }
+        .theme-devil .wings { --wing-color: #7b1111; }
 
         .halo { display: none; position: absolute; top: -8px; left: -4px; width: 36px; height: 10px; border-radius: 50%; border: 3px solid #ffd700; box-shadow: 0 0 10px #ffd700; z-index: 5;}
-        .wings { display: none; position: absolute; top: 30px; left: 15px; width: 60px; height: 40px; opacity: 0.8; z-index: 0;}
-        .wing-l, .wing-r { position: absolute; width: 35px; height: 20px; border-radius: 50% 50% 0 0; background: var(--wing-color, #fff); transform-origin: bottom right;}
-        .wing-l { left: -5px; transform: rotate(-30deg); }
-        .wing-r { right: -5px; transform: scaleX(-1) rotate(-30deg); }
-        .horns { display: none; position: absolute; top: -6px; left: 2px; width: 28px; height: 10px; justify-content: space-between; z-index: 5;}
+        
+        .horns { 
+            display: none; 
+            position: absolute; 
+            top: -10px; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px; 
+            justify-content: space-between; 
+            z-index: 5;
+        }
         .horn { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 12px solid #ff2a35; transform: rotate(-15deg); }
         .horn-r { transform: rotate(15deg); }
 
-        /* Animations Poses classes */
+        /* Combative Pose Animation Overrides */
         .anim-punch .arm-right { transform: rotate(5deg) scaleX(1.3); width: 46px; background: #fff; box-shadow: 0 0 8px #fff; }
         .anim-punch .torso { transform: rotate(8deg); }
         
@@ -156,129 +262,175 @@
         
         .hit-flash { filter: brightness(2.5) drop-shadow(0 0 12px #ff2a35); }
 
-        /* Projectiles */
+        /* Projectile Elements */
         .projectile {
             position: absolute; z-index: 15; font-size: 28px; text-shadow: 0 0 5px rgba(255,255,255,0.5);
             transition: transform 0.05s linear;
         }
         
-        /* Leaderboard styling elements */
+        /* Mobile Touch Overlay Processing Mapping */
+        #mobile-controller-layer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 50;
+            pointer-events: none;
+        }
+        .control-pad { display: flex; gap: 8px; pointer-events: auto; }
+        .touch-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(26, 26, 38, 0.75);
+            border: 2px solid rgba(255,255,255,0.4);
+            border-radius: 50%;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .touch-btn:active { background: #ff2a35; border-color: #fff; }
+
         table { width: 80%; border-collapse: collapse; margin: 20px 0; }
         th, td { padding: 8px; text-align: left; border-bottom: 1px solid #444; }
     </style>
 </head>
 <body>
 
-    <div id="game-container">
-        
-        <!-- Projectile Layer -->
-        <div id="projectile-layer"></div>
+    <div id="canvas-scaler">
+        <div id="game-container">
+            
+            <div id="projectile-layer"></div>
 
-        <!-- HUD display area -->
-        <div id="hud" class="hidden">
-            <div class="health-bar-container">
-                <span class="char-info" id="player-info">Player</span>
-                <div id="player-fill" class="health-fill"></div>
-            </div>
-            <div id="match-stats">
-                <div id="timer">60</div>
-                <div id="level-badge">LEVEL 1</div>
-            </div>
-            <div class="health-bar-container">
-                <span class="char-info" id="enemy-info">Enemy</span>
-                <div id="enemy-fill" class="health-fill"></div>
-            </div>
-        </div>
-
-        <!-- Player Object -->
-        <div id="player" class="fighter hidden" style="--char-color: #3498db;">
-            <div class="sprite" id="player-sprite">
-                <div class="head">
-                    <div class="accessory acc-hat"></div>
-                    <div class="accessory acc-mask"></div>
-                    <div class="accessory acc-visor"></div>
-                    <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+            <div id="hud" class="hidden">
+                <div class="health-bar-container">
+                    <span class="char-info" id="player-info">Player</span>
+                    <div id="player-fill" class="health-fill"></div>
                 </div>
-                <div class="torso"><div class="accessory acc-clover">♣</div></div>
-                <div class="arm arm-left"></div>
-                <div class="arm arm-right"></div>
-                <div class="leg leg-left"></div>
-                <div class="leg leg-right"></div>
-            </div>
-        </div>
-
-        <!-- Enemy Object -->
-        <div id="enemy" class="fighter hidden" style="--char-color: #f1c40f;">
-            <div class="sprite" id="enemy-sprite">
-                <div class="head">
-                    <div class="halo"></div>
-                    <div class="horns"><div class="horn"></div><div class="horn horn-r"></div></div>
-                    <div class="accessory acc-mask"></div>
-                    <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+                <div id="match-stats">
+                    <div id="timer">60</div>
+                    <div id="level-badge">LEVEL 1</div>
                 </div>
-                <div class="torso"><div class="wings"><div class="wing-l"></div><div class="wing-r"></div></div></div>
-                <div class="arm arm-left"></div>
-                <div class="arm arm-right"></div>
-                <div class="leg leg-left"></div>
-                <div class="leg leg-right"></div>
+                <div class="health-bar-container">
+                    <span class="char-info" id="enemy-info">Enemy</span>
+                    <div id="enemy-fill" class="health-fill"></div>
+                </div>
             </div>
-        </div>
 
-        <!-- 1. Home Screen -->
-        <div id="home-screen" class="screen">
-            <h1>Dom beats them up.</h1>
-            <div class="menu-group">
-                <button onclick="showScreen('char-select-screen')">Start Game</button>
-                <button onclick="showScreen('leaderboard-screen')">Leaderboard</button>
+            <div id="player" class="fighter hidden" style="--char-color: #3498db;">
+                <div class="sprite" id="player-sprite">
+                    <div class="head">
+                        <div class="accessory acc-hat"></div>
+                        <div class="accessory acc-mask"></div>
+                        <div class="accessory acc-visor"></div>
+                        <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+                    </div>
+                    <div class="torso">
+                        <div class="wings"><div class="wing-l"></div><div class="wing-r"></div></div>
+                        <div class="accessory acc-clover">♣</div>
+                        <div class="arm arm-left"></div>
+                        <div class="arm arm-right"></div>
+                        <div class="leg leg-left"></div>
+                        <div class="leg leg-right"></div>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- 2. Character Select Screen -->
-        <div id="char-select-screen" class="screen hidden">
-            <h1 style="font-size: 2rem;">Choose Your Fighter</h1>
-            <div class="char-grid">
-                <button class="char-btn" onclick="selectCharacter('speedways')"><span>📖</span>Speedways</button>
-                <button class="char-btn" onclick="selectCharacter('lee')"><span>🍣</span>Lee</button>
-                <button class="char-btn" onclick="selectCharacter('dom')"><span>🍕</span>Dom</button>
-                <button class="char-btn" onclick="selectCharacter('spaniard')"><span>🥖</span>Spaniard</button>
-                <button class="char-btn" onclick="selectCharacter('catterson')"><span>🔪</span>Catterson</button>
-                <button class="char-btn" onclick="selectCharacter('jeff')"><span>🛞</span>Jeff</button>
+            <div id="enemy" class="fighter hidden" style="--char-color: #f1c40f;">
+                <div class="sprite" id="enemy-sprite">
+                    <div class="head">
+                        <div class="halo"></div>
+                        <div class="horns"><div class="horn"></div><div class="horn horn-r"></div></div>
+                        <div class="accessory acc-mask"></div>
+                        <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+                    </div>
+                    <div class="torso">
+                        <div class="wings"><div class="wing-l"></div><div class="wing-r"></div></div>
+                        <div class="arm arm-left"></div>
+                        <div class="arm arm-right"></div>
+                        <div class="leg leg-left"></div>
+                        <div class="leg leg-right"></div>
+                    </div>
+                </div>
             </div>
-            <button style="margin-top:20px; background:#444;" onclick="showScreen('home-screen')">Back</button>
-        </div>
 
-        <!-- 3. Difficulty Screen -->
-        <div id="diff-screen" class="screen hidden">
-            <h1 style="font-size: 2rem;">Select Difficulty</h1>
-            <div class="menu-group">
-                <button onclick="startGame('easy')">Easy</button>
-                <button onclick="startGame('medium')">Medium</button>
-                <button onclick="startGame('hard')">Hard</button>
+            <div id="mobile-controller-layer">
+                <div class="control-pad">
+                    <div class="touch-btn" id="btn-left">←</div>
+                    <div class="touch-btn" id="btn-right">→</div>
+                    <div class="touch-btn" id="btn-duck">↓</div>
+                    <div class="touch-btn" id="btn-jump">↑</div>
+                </div>
+                <div class="control-pad">
+                    <div class="touch-btn" id="btn-block" style="font-size:0.8rem;">BLKD</div>
+                    <div class="touch-btn" id="btn-punch">J</div>
+                    <div class="touch-btn" id="btn-big">U</div>
+                    <div class="touch-btn" id="btn-kick">K</div>
+                    <div class="touch-btn" id="btn-proj">L</div>
+                </div>
             </div>
-        </div>
 
-        <!-- 4. Game Over Screen -->
-        <div id="gameover-screen" class="screen hidden">
-            <h1 id="win-loss-title">MATCH OVER</h1>
-            <p id="score-reporting" style="margin-bottom: 15px; color: #ffd700;"></p>
-            <div class="menu-group">
-                <button onclick="showLeaderboardInput()">Save Score</button>
-                <button onclick="returnToHome()">Home</button>
+            <div id="home-screen" class="screen">
+                <h1>Dom beats them up.</h1>
+                <div class="menu-group">
+                    <button id="btn-core-start">Start Game</button>
+                    <button id="btn-core-lead">Leaderboard</button>
+                </div>
             </div>
-        </div>
 
-        <!-- 5. Leaderboard Screen -->
-        <div id="leaderboard-screen" class="screen hidden">
-            <h1>Leaderboard</h1>
-            <div id="leaderboard-area" style="width:100%; display:flex; flex-direction:column; align-items:center;">
-                <table id="scores-table">
-                    <thead><tr><th>Rank</th><th>Name</th><th>Level</th><th>Score</th></tr></thead>
-                    <tbody id="leaderboard-body"></tbody>
-                </table>
+            <div id="char-select-screen" class="screen hidden">
+                <h1 style="font-size: 2rem;">Choose Your Fighter</h1>
+                <div class="char-grid">
+                    <button class="char-btn" data-char="speedways"><span>📖</span>Speedways</button>
+                    <button class="char-btn" data-char="lee"><span>🍣</span>Lee</button>
+                    <button class="char-btn" data-char="dom"><span>🍕</span>Dom</button>
+                    <button class="char-btn" data-char="spaniard"><span>🥖</span>Spaniard</button>
+                    <button class="char-btn" data-char="catterson"><span>🔪</span>Catterson</button>
+                    <button class="char-btn" data-char="jeff"><span>🛞</span>Jeff</button>
+                </div>
+                <button style="margin-top:20px; background:#444;" id="btn-char-back">Back</button>
             </div>
-            <div class="menu-group" style="margin-top:10px;">
-                <button onclick="returnToHome()">Back To Menu</button>
+
+            <div id="diff-screen" class="screen hidden">
+                <h1 style="font-size: 2rem;">Select Difficulty</h1>
+                <div class="menu-group">
+                    <button class="diff-btn" data-diff="easy">Easy</button>
+                    <button class="diff-btn" data-diff="medium">Medium</button>
+                    <button class="diff-btn" data-diff="hard">Hard</button>
+                </div>
             </div>
+
+            <div id="gameover-screen" class="screen hidden">
+                <h1 id="win-loss-title">MATCH OVER</h1>
+                <p id="score-reporting" style="margin-bottom: 15px; color: #ffd700;"></p>
+                <div class="menu-group">
+                    <button id="btn-save-score">Save Score</button>
+                    <button id="btn-exit-home">Home</button>
+                </div>
+            </div>
+
+            <div id="leaderboard-screen" class="screen hidden">
+                <h1>Leaderboard</h1>
+                <div id="leaderboard-area" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+                    <table id="scores-table">
+                        <thead><tr><th>Rank</th><th>Name</th><th>Level</th><th>Score</th></tr></thead>
+                        <tbody id="leaderboard-body"></tbody>
+                    </table>
+                </div>
+                <div class="menu-group" style="margin-top:10px;">
+                    <button id="btn-lead-back">Back To Menu</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -288,64 +440,115 @@
         let state = {
             playerCharKey: 'dom', difficulty: 'medium', currentLevel: 1, score: 0, 
             gameActive: false, timeLeft: 60, timerInterval: null, musicInterval: null, musicStep: 0,
-            activeProjectiles: []
+            activeProjectiles: [], isMobileDevice: false
         };
 
         const charData = {
             'speedways': { name: "Speedways", color: "#3498db", theme: "theme-speedways", proj: "📖" },
-            'lee': { name: "Lee", color: "#111", theme: "theme-lee", proj: "🍣" },
+            'lee': { name: "Lee", color: "#222222", theme: "theme-lee", proj: "🍣" },
             'dom': { name: "Dom", color: "#008C45", theme: "theme-dom", proj: "🍕" },
             'spaniard': { name: "Spaniard", color: "#AA151B", theme: "theme-spaniard", proj: "🥖" },
             'catterson': { name: "Catterson", color: "#008000", theme: "theme-catterson", proj: "🔪" },
-            'jeff': { name: "Jeff", color: "#111", theme: "theme-jeff", proj: "🛞" }
+            'jeff': { name: "Jeff", color: "#1c1c1c", theme: "theme-jeff", proj: "🛞" }
         };
 
         const levelData = {
-            1: { name: "Angel", color: "#f1c40f", theme: "theme-angel", proj: "⚡", health: 100, aiSpeed: 2.2 },
-            2: { name: "Ninja", color: "#111", theme: "theme-ninja-enemy", proj: "✺", health: 135, aiSpeed: 3.8 },
-            3: { name: "Devil", color: "#8e44ad", theme: "theme-devil", proj: "🔥", health: 180, aiSpeed: 5.8 }
+            1: { name: "Angel", color: "#ffffff", theme: "theme-angel", proj: "⚡", health: 100, aiSpeed: 2.2 },
+            2: { name: "Ninja", color: "#111111", theme: "theme-ninja-enemy", proj: "✺", health: 135, aiSpeed: 3.8 },
+            3: { name: "Devil", color: "#800080", theme: "theme-devil", proj: "🔥", health: 180, aiSpeed: 5.8 }
         };
 
         let player = { x: 100, y: 0, vx: 0, vy: 0, health: 100, isAttacking: false, isDucking: false, isBlocking: false, isJumping: false, lastProj: 0 };
         let enemy = { x: 600, y: 0, vy: 0, health: 100, isAttacking: false, isJumping: false, lastAttackTime: 0, lastProj: 0 };
         let leaderboard = [];
 
-        // Synthesizer Audio Engine Controller
+        // Unified Audio Context Implementation 
         let audioCtx = null;
-        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        function initAudio() { 
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
 
         function playTone(freq, type, dur, vol, slide = null) {
             if (!audioCtx) return;
             try {
-                let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
-                osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                if (slide) osc.frequency.exponentialRampToValueAtTime(slide, audioCtx.currentTime + dur);
+                let osc = audioCtx.createOscillator(); 
+                let gain = audioCtx.createGain();
+                osc.type = type; 
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                if (slide) {
+                    osc.frequency.exponentialRampToValueAtTime(slide, audioCtx.currentTime + dur);
+                }
                 gain.gain.setValueAtTime(vol, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + dur);
+                osc.connect(gain); 
+                gain.connect(audioCtx.destination);
+                osc.start(); 
+                osc.stop(audioCtx.currentTime + dur);
             } catch(e) {}
         }
 
         function soundFx(type) {
-            if (type === 'punch') playTone(180, 'triangle', 0.12, 0.4, 60);
-            if (type === 'bigpunch') playTone(120, 'sawtooth', 0.25, 0.6, 30);
-            if (type === 'kick') playTone(150, 'triangle', 0.15, 0.45, 40);
-            if (type === 'jump') playTone(200, 'sine', 0.18, 0.25, 400);
-            if (type === 'block') playTone(90, 'square', 0.1, 0.3, 80);
-            if (type === 'hit') playTone(300, 'sawtooth', 0.1, 0.5, 90);
-            if (type === 'throw') playTone(600, 'sine', 0.2, 0.3, 100);
+            if (type === 'punch') playTone(180, 'triangle', 0.12, 0.5, 60);
+            if (type === 'bigpunch') playTone(120, 'sawtooth', 0.25, 0.7, 30);
+            if (type === 'kick') playTone(150, 'triangle', 0.15, 0.55, 40);
+            if (type === 'jump') playTone(200, 'sine', 0.18, 0.3, 400);
+            if (type === 'block') playTone(90, 'square', 0.1, 0.4, 80);
+            if (type === 'hit') playTone(320, 'sawtooth', 0.1, 0.6, 100);
+        }
+
+        function playProjectileSound(characterKey, isPlayerLaunched) {
+            if (!isPlayerLaunched) {
+                if (state.currentLevel === 1) playTone(1200, 'square', 0.25, 0.5, 200); 
+                if (state.currentLevel === 2) playTone(750, 'sine', 0.1, 0.45, 1100);  
+                if (state.currentLevel === 3) playTone(90, 'sawtooth', 0.45, 0.85, 35); 
+                return;
+            }
+            switch(characterKey) {
+                case 'speedways': 
+                    playTone(850, 'triangle', 0.15, 0.8, 250);
+                    break;
+                case 'lee': 
+                    playTone(950, 'sine', 0.12, 0.75, 1400);
+                    break;
+                case 'dom': 
+                    playTone(190, 'sawtooth', 0.35, 0.95, 75);
+                    break;
+                case 'spaniard': 
+                    playTone(400, 'square', 0.22, 0.85, 200);
+                    break;
+                case 'catterson': 
+                    playTone(1300, 'sine', 0.09, 0.75, 2400);
+                    break;
+                case 'jeff': 
+                    playTone(380, 'sawtooth', 0.28, 0.85, 800);
+                    break;
+            }
         }
 
         function playBeatStep() {
             if (!state.gameActive) return;
             state.musicStep = (state.musicStep + 1) % 8;
             let bassNotes = [55, 55, 65, 55, 73, 55, 65, 49];
-            if (state.musicStep % 2 === 0) playTone(bassNotes[state.musicStep], 'triangle', 0.2, 0.18);
-            if (state.musicStep === 2 || state.musicStep === 6) playTone(220, 'square', 0.06, 0.06, 80);
+            if (state.musicStep % 2 === 0) playTone(bassNotes[state.musicStep], 'triangle', 0.2, 0.2);
+            if (state.musicStep === 2 || state.musicStep === 6) playTone(220, 'square', 0.06, 0.08, 80);
         }
 
-        // Screen Routing
+        function scaleGameWindow() {
+            const wrapper = document.getElementById('canvas-scaler');
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            let scale = Math.min(w / 820, h / 420);
+            if (scale > 1) scale = 1; 
+            wrapper.style.transform = `scale(${scale})`;
+        }
+        window.addEventListener('resize', scaleGameWindow);
+        window.addEventListener('load', scaleGameWindow);
+
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
@@ -356,11 +559,12 @@
             showScreen('diff-screen');
         }
 
-        // Input
+        // Matrix Event Listeners
         const keys = { Left: false, Right: false, Duck: false, Block: false };
 
         window.addEventListener('keydown', e => {
             if(!state.gameActive) return;
+            initAudio();
             if(e.code === 'KeyA' || e.code === 'ArrowLeft') keys.Left = true;
             if(e.code === 'KeyD' || e.code === 'ArrowRight') keys.Right = true;
             if(e.code === 'KeyS' || e.code === 'ArrowDown') keys.Duck = true;
@@ -382,6 +586,67 @@
             if(e.code === 'Space') keys.Block = false;
         });
 
+        // Touch Interaction Mapping Model
+        function bindTouchControl(elementId, actionCallbackOrKeyState, isKeyMode = false, keyTargetStr = "") {
+            const el = document.getElementById(elementId);
+            
+            el.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                initAudio();
+                state.isMobileDevice = true;
+                document.getElementById('mobile-controller-layer').style.display = 'flex';
+                
+                if (isKeyMode) {
+                    keys[keyTargetStr] = true;
+                } else {
+                    actionCallbackOrKeyState();
+                }
+            }, { passive: false });
+
+            el.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                if (isKeyMode) keys[keyTargetStr] = false;
+            }, { passive: false });
+        }
+
+        bindTouchControl('btn-left', null, true, 'Left');
+        bindTouchControl('btn-right', null, true, 'Right');
+        bindTouchControl('btn-duck', null, true, 'Duck');
+        bindTouchControl('btn-block', null, true, 'Block');
+        
+        bindTouchControl('btn-jump', () => {
+            if (!player.isJumping && !player.isDucking && !player.isBlocking) {
+                player.vy = -14; player.isJumping = true; soundFx('jump');
+            }
+        });
+        bindTouchControl('btn-punch', () => performAttack('punch'));
+        bindTouchControl('btn-big', () => performAttack('big-punch'));
+        bindTouchControl('btn-kick', () => performAttack('kick'));
+        bindTouchControl('btn-proj', () => fireProjectile(true));
+
+        window.addEventListener('touchstart', function detection() {
+            state.isMobileDevice = true;
+            if(state.gameActive) document.getElementById('mobile-controller-layer').style.display = 'flex';
+            window.removeEventListener('touchstart', detection);
+        });
+
+        function attachDomUIEvents() {
+            document.getElementById('btn-core-start').onclick = () => { initAudio(); showScreen('char-select-screen'); };
+            document.getElementById('btn-core-lead').onclick = () => { initAudio(); showScreen('leaderboard-screen'); };
+            document.getElementById('btn-char-back').onclick = () => showScreen('home-screen');
+            document.getElementById('btn-exit-home').onclick = () => returnToHome();
+            document.getElementById('btn-lead-back').onclick = () => returnToHome();
+            document.getElementById('btn-save-score').onclick = () => showLeaderboardInput();
+
+            document.querySelectorAll('.char-btn').forEach(btn => {
+                btn.onclick = () => selectCharacter(btn.getAttribute('data-char'));
+            });
+            document.querySelectorAll('.diff-btn').forEach(btn => {
+                btn.onclick = () => startGame(btn.getAttribute('data-diff'));
+            });
+        }
+        attachDomUIEvents();
+
         function startGame(difficulty) {
             initAudio();
             state.difficulty = difficulty; state.currentLevel = 1; state.score = 0; state.activeProjectiles = [];
@@ -391,8 +656,9 @@
             document.getElementById('hud').classList.remove('hidden');
             document.getElementById('player').classList.remove('hidden');
             document.getElementById('enemy').classList.remove('hidden');
-            state.gameActive = true;
+            if (state.isMobileDevice) document.getElementById('mobile-controller-layer').style.display = 'flex';
             
+            state.gameActive = true;
             setupLevel(state.currentLevel);
             
             clearInterval(state.timerInterval); clearInterval(state.musicInterval);
@@ -405,6 +671,7 @@
             }, 1000);
             state.musicInterval = setInterval(playBeatStep, 220);
 
+            scaleGameWindow();
             window.requestAnimationFrame(updateFrameLoop);
         }
 
@@ -412,8 +679,12 @@
             const eData = levelData[lvl];
             const pData = charData[state.playerCharKey];
             
-            player.health = 100; player.x = 100; player.y = 0;
-            enemy.health = eData.health; enemy.x = 600; enemy.y = 0;
+            player.health = 100; player.x = 100; player.y = 0; player.vx = 0; player.vy = 0;
+            player.isAttacking = false; player.isDucking = false; player.isBlocking = false; player.isJumping = false;
+            
+            enemy.health = eData.health; enemy.x = 600; enemy.y = 0; enemy.vy = 0;
+            enemy.isAttacking = false; enemy.isJumping = false;
+            
             state.activeProjectiles = [];
             document.getElementById('projectile-layer').innerHTML = '';
 
@@ -438,25 +709,28 @@
             
             player.isDucking = keys.Duck && !player.isJumping;
             player.isBlocking = keys.Block && !player.isDucking && !player.isJumping;
-            pEl.classList.toggle('anim-duck', player.isDucking); pEl.classList.toggle('anim-block', player.isBlocking);
+            
+            pEl.classList.toggle('anim-duck', player.isDucking); 
+            pEl.classList.toggle('anim-block', player.isBlocking);
 
-            // Gravity
-            if(player.isJumping) { player.vy += config.gravity; player.y += player.vy; if(player.y >= 0) { player.y = 0; player.isJumping = false; } }
-            if(enemy.isJumping) { enemy.vy += config.gravity; enemy.y += enemy.vy; if(enemy.y >= 0) { enemy.y = 0; enemy.isJumping = false; } }
+            if(player.isJumping) { player.vy += config.gravity; player.y += player.vy; if(player.y >= 0) { player.y = 0; player.isJumping = false; player.vy = 0; } }
+            if(enemy.isJumping) { enemy.vy += config.gravity; enemy.y += enemy.vy; if(enemy.y >= 0) { enemy.y = 0; enemy.isJumping = false; enemy.vy = 0; } }
 
-            // Movement
+            // Dynamic Unbound Movement Execution
             player.vx = 0;
             if(!player.isDucking && !player.isBlocking && !player.isAttacking) {
                 if(keys.Left) player.vx = -config.baseSpeed;
                 if(keys.Right) player.vx = config.baseSpeed;
             }
             player.x += player.vx;
+            
             if(player.x < 0) player.x = 0;
-            if(player.x > enemy.x - 35) player.x = enemy.x - 35;
+            if(player.x > enemy.x - 55) player.x = enemy.x - 55;
 
             processEnemyAI();
             processProjectiles();
 
+            // Transform Assignments Run Flawlessly Without Clashing With Visual Scale Configuration Rules
             pEl.style.transform = `translate(${player.x}px, ${player.y}px)`;
             eEl.style.transform = `translate(${enemy.x}px, ${enemy.y}px)`;
 
@@ -472,18 +746,16 @@
             const dist = enemy.x - player.x;
 
             if (!enemy.isAttacking) {
-                if(dist > 70) enemy.x -= spd;
-                else if (dist < 55) enemy.x += spd;
+                if(dist > 75) enemy.x -= spd;
+                else if (dist < 60) enemy.x += spd;
             }
             if(enemy.x > config.width - 90) enemy.x = config.width - 90;
 
             const now = Date.now();
-            // AI Melee
             if(dist <= 95 && (now - enemy.lastAttackTime > atkInt)) {
                 performEnemyAttack(dist);
             }
-            // AI Projectile (Only when distant)
-            else if (dist > 180 && now - enemy.lastProj > 2000 && Math.random() < projChance) {
+            else if (dist > 200 && now - enemy.lastProj > 1800 && Math.random() < projChance) {
                 fireProjectile(false);
             }
         }
@@ -492,17 +764,17 @@
             const now = Date.now();
             const source = isPlayer ? player : enemy;
             if(source.isAttacking || source.isBlocking || source.isDucking) return;
-            if(isPlayer && now - player.lastProj < 1000) return; // Cooldown
+            if(isPlayer && now - player.lastProj < 800) return; 
             
             source.isAttacking = true; source.lastProj = now;
-            soundFx('throw');
+            playProjectileSound(state.playerCharKey, isPlayer);
             
             const el = document.getElementById(isPlayer ? 'player' : 'enemy');
             el.classList.add('anim-throw');
 
             const symbol = isPlayer ? charData[state.playerCharKey].proj : levelData[state.currentLevel].proj;
-            const px = isPlayer ? source.x + 50 : source.x;
-            const py = 300 + source.y; // approximate hand height
+            const px = isPlayer ? source.x + 55 : source.x - 15;
+            const py = 300 + source.y; 
 
             const pDiv = document.createElement('div');
             pDiv.className = 'projectile'; pDiv.innerText = symbol;
@@ -510,11 +782,11 @@
 
             state.activeProjectiles.push({
                 isPlayer: isPlayer, x: px, y: py,
-                vx: isPlayer ? 10 : -10,
+                vx: isPlayer ? 11 : -11,
                 el: pDiv, active: true
             });
 
-            setTimeout(() => { el.classList.remove('anim-throw'); source.isAttacking = false; }, 300);
+            setTimeout(() => { el.classList.remove('anim-throw'); source.isAttacking = false; }, 250);
         }
 
         function processProjectiles() {
@@ -523,18 +795,17 @@
                 p.x += p.vx;
                 p.el.style.transform = `translate(${p.x}px, ${p.y}px)`;
 
-                // Collision Logic
                 const target = p.isPlayer ? enemy : player;
                 const tx = target.x;
                 
                 let hit = false;
-                if(p.isPlayer && p.x > tx && p.x < tx + 50) hit = true;
-                if(!p.isPlayer && p.x < tx + 50 && p.x > tx) hit = true;
+                if(p.isPlayer && p.x > tx && p.x < tx + 60) hit = true;
+                if(!p.isPlayer && p.x < tx + 60 && p.x > tx) hit = true;
 
                 if(hit) {
                     p.active = false; p.el.remove();
                     
-                    if(!p.isPlayer && player.isDucking) return; // Duck to dodge
+                    if(!p.isPlayer && player.isDucking) return; 
                     if(!p.isPlayer && player.isBlocking) { soundFx('block'); target.health -= 2; }
                     else {
                         soundFx('hit'); target.health -= 15;
@@ -560,7 +831,7 @@
             if(type === 'kick') soundFx('kick');
 
             const dist = enemy.x - player.x;
-            let rng = type === 'big-punch' ? 115 : 95;
+            let rng = type === 'big-punch' ? 120 : 100;
 
             if(dist > 0 && dist <= rng) {
                 let dmg = type === 'big-punch' ? 22 : (type === 'kick' ? 14 : 10);
@@ -584,7 +855,7 @@
             eEl.classList.add(atkType);
             soundFx(atkType.includes('big') ? 'bigpunch' : (atkType.includes('kick') ? 'kick' : 'punch'));
 
-            if(dist > 0 && dist <= 95) {
+            if(dist > 0 && dist <= 100) {
                 if (player.isDucking && atkType !== 'anim-kick') {} 
                 else {
                     let bdmg = state.currentLevel === 3 ? 16 : 11;
@@ -627,6 +898,7 @@
             document.getElementById('hud').classList.add('hidden');
             document.getElementById('player').classList.add('hidden');
             document.getElementById('enemy').classList.add('hidden');
+            document.getElementById('mobile-controller-layer').style.display = 'none';
             document.getElementById('win-loss-title').innerText = msg;
             document.getElementById('score-reporting').innerText = `Final Score: ${state.score}`;
             showScreen('gameover-screen');
@@ -647,7 +919,15 @@
             showScreen('leaderboard-screen');
         }
 
-        function returnToHome() { showScreen('home-screen'); }
+        function returnToHome() { 
+            state.gameActive = false;
+            clearInterval(state.timerInterval); clearInterval(state.musicInterval);
+            document.getElementById('hud').classList.add('hidden');
+            document.getElementById('player').classList.add('hidden');
+            document.getElementById('enemy').classList.add('hidden');
+            document.getElementById('mobile-controller-layer').style.display = 'none';
+            showScreen('home-screen'); 
+        }
     </script>
 </body>
 </html>
