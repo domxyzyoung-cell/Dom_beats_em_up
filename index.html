@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Dom beats them up.</title>
+    <title>Dom beats em up.</title>
     <style>
         * {
             box-sizing: border-box; 
@@ -24,14 +24,19 @@
             justify-content: center; 
             height: 100vh;
             width: 100vw;
+            /* Ensures background spans past safe areas on iPhone landscape */
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
         
+        /* Dynamic Axis Scaling for Cross-Device Viewports */
         #canvas-scaler {
             display: flex;
             align-items: center;
             justify-content: center;
             transform-origin: center center;
-            transition: transform 0.1s ease-out;
+            transition: transform 0.15s ease-out;
+            width: 100%;
+            height: 100%;
         }
 
         #game-container {
@@ -42,8 +47,11 @@
             border: 4px solid #444; 
             overflow: hidden; 
             box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            /* Allows scaling to shrink perfectly into mobile views */
+            flex-shrink: 0; 
         }
         
+        /* Structural Navigation Screen Matrix */
         .screen {
             position: absolute; 
             top: 0; 
@@ -55,7 +63,7 @@
             align-items: center; 
             justify-content: center;
             background: rgba(8, 8, 14, 0.96); 
-            z-index: 50;
+            z-index: 20;
         }
         .hidden { display: none !important; }
         
@@ -90,6 +98,7 @@
         .char-btn { font-size: 1rem; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 5px;}
         .char-btn span { font-size: 24px; }
         
+        /* HUD Interface Blueprint */
         #hud {
             position: absolute; 
             top: 0; 
@@ -109,6 +118,7 @@
         #match-stats { text-align: center; font-size: 1.5rem; font-weight: bold; text-shadow: 0 2px 4px #000; }
         #level-badge { color: #ffd700; font-size: 0.9rem; display: block; margin-top: 2px; }
 
+        /* Fighter Spatial Node Container */
         .fighter {
             position: absolute; 
             bottom: 20px; 
@@ -117,6 +127,7 @@
             transform-origin: bottom center;
         }
         
+        /* Isolated Scaling Vector to Prevent Transformation Clamping */
         .sprite { 
             position: relative; 
             width: 100%; 
@@ -126,6 +137,7 @@
         }
         #enemy .sprite { transform: scaleX(-1) scale(var(--c-scale, 1)); }
 
+        /* Anatomy Anchors */
         .head {
             position: absolute; top: 12px; left: 30px; width: 30px; height: 30px;
             border-radius: 50%; border: 3px solid var(--char-color); background: #111; z-index: 3;
@@ -154,6 +166,7 @@
         .leg-left { transform: translateX(-50%) rotate(105deg); }
         .leg-right { transform: translateX(-50%) rotate(75deg); }
 
+        /* Accessory Configuration Nodes */
         .accessory { display: none; position: absolute; }
 
         .theme-speedways { --c-scale: 1.0; }
@@ -250,20 +263,20 @@
             transition: transform 0.05s linear;
         }
         
-        /* * MOBILE CONTROLLER LAYER 
-         * Hidden on desktop, explicitly forced visible via CSS on mobile/touch screens
+        /* * RESPONSIVE MOBILE CONTROLLER OVERLAY *
+         * Fixed outside the scaler so it anchors to device edges.
          */
         #mobile-controller-layer {
             position: absolute;
-            bottom: 15px;
-            left: 0;
-            width: 100%;
-            height: 100px;
+            bottom: max(15px, env(safe-area-inset-bottom));
+            left: max(10px, env(safe-area-inset-left));
+            right: max(10px, env(safe-area-inset-right));
+            height: 90px;
             display: none; 
             justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
+            align-items: flex-end;
             z-index: 9999;
+            pointer-events: none;
         }
 
         /* HARD OVERRIDE: Show controls if screen is small OR device has touch capability */
@@ -273,15 +286,15 @@
             }
         }
 
-        .control-pad { display: flex; gap: 8px; }
+        .control-pad { display: flex; gap: 10px; pointer-events: auto; }
         .touch-btn {
-            width: 50px;
-            height: 50px;
-            background: rgba(26, 26, 38, 0.85);
-            border: 2px solid rgba(255,255,255,0.6);
+            width: 55px;
+            height: 55px;
+            background: rgba(26, 26, 38, 0.75);
+            border: 2px solid rgba(255,255,255,0.4);
             border-radius: 50%;
             color: #fff;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -290,7 +303,7 @@
             -webkit-user-select: none;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-        .touch-btn:active { background: #ff2a35; border-color: #fff; transform: scale(0.95); }
+        .touch-btn:active { background: #ff2a35; border-color: #fff; transform: scale(0.92); }
 
         table { width: 80%; border-collapse: collapse; margin: 20px 0; }
         th, td { padding: 8px; text-align: left; border-bottom: 1px solid #444; }
@@ -355,24 +368,8 @@
                 </div>
             </div>
 
-            <div id="mobile-controller-layer">
-                <div class="control-pad">
-                    <div class="touch-btn" id="btn-left">←</div>
-                    <div class="touch-btn" id="btn-right">→</div>
-                    <div class="touch-btn" id="btn-duck">↓</div>
-                    <div class="touch-btn" id="btn-jump">↑</div>
-                </div>
-                <div class="control-pad">
-                    <div class="touch-btn" id="btn-block" style="font-size:0.8rem;">BLK</div>
-                    <div class="touch-btn" id="btn-punch">P</div>
-                    <div class="touch-btn" id="btn-big">U</div>
-                    <div class="touch-btn" id="btn-kick">K</div>
-                    <div class="touch-btn" id="btn-proj">🔥</div>
-                </div>
-            </div>
-
             <div id="home-screen" class="screen">
-                <h1>Dom beats them up.</h1>
+                <h1>Dom beats em up.</h1>
                 <div class="menu-group">
                     <button id="btn-core-start">Start Game</button>
                     <button id="btn-core-lead">Leaderboard</button>
@@ -426,6 +423,22 @@
         </div>
     </div>
 
+    <div id="mobile-controller-layer">
+        <div class="control-pad">
+            <div class="touch-btn" id="btn-left">←</div>
+            <div class="touch-btn" id="btn-right">→</div>
+            <div class="touch-btn" id="btn-duck">↓</div>
+            <div class="touch-btn" id="btn-jump">↑</div>
+        </div>
+        <div class="control-pad">
+            <div class="touch-btn" id="btn-block" style="font-size:0.8rem;">BLK</div>
+            <div class="touch-btn" id="btn-punch">P</div>
+            <div class="touch-btn" id="btn-big">U</div>
+            <div class="touch-btn" id="btn-kick">K</div>
+            <div class="touch-btn" id="btn-proj">🔥</div>
+        </div>
+    </div>
+
     <script>
         const config = { width: 800, baseSpeed: 5.5, gravity: 0.65, groundY: 20 };
 
@@ -438,455 +451,6 @@
         const charData = {
             'speedways': { name: "Speedways", color: "#3498db", theme: "theme-speedways", proj: "📖" },
             'lee': { name: "Lee", color: "#222222", theme: "theme-lee", proj: "🍣" },
-            'dom': { name: "Dom", color: "#008C45", theme: "theme-dom", proj: "🍕" },
+            'dom': { name: "Dom Italia 19", color: "#008C45", theme: "theme-dom", proj: "🍕" },
             'spaniard': { name: "Spaniard", color: "#AA151B", theme: "theme-spaniard", proj: "🥖" },
-            'catterson': { name: "Catterson", color: "#008000", theme: "theme-catterson", proj: "🔪" },
-            'jeff': { name: "Jeff", color: "#1c1c1c", theme: "theme-jeff", proj: "🛞" }
-        };
-
-        const levelData = {
-            1: { name: "Angel", color: "#ffffff", theme: "theme-angel", proj: "⚡", health: 100, aiSpeed: 2.2 },
-            2: { name: "Ninja", color: "#111111", theme: "theme-ninja-enemy", proj: "✺", health: 135, aiSpeed: 3.8 },
-            3: { name: "Devil", color: "#800080", theme: "theme-devil", proj: "🔥", health: 180, aiSpeed: 5.8 }
-        };
-
-        let player = { x: 100, y: 0, vx: 0, vy: 0, health: 100, isAttacking: false, isDucking: false, isBlocking: false, isJumping: false, lastProj: 0 };
-        let enemy = { x: 600, y: 0, vy: 0, health: 100, isAttacking: false, isJumping: false, lastAttackTime: 0, lastProj: 0 };
-        let leaderboard = [];
-
-        let audioCtx = null;
-        function initAudio() { 
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }
-
-        function playTone(freq, type, dur, vol, slide = null) {
-            if (!audioCtx) return;
-            try {
-                let osc = audioCtx.createOscillator(); 
-                let gain = audioCtx.createGain();
-                osc.type = type; 
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                if (slide) {
-                    osc.frequency.exponentialRampToValueAtTime(slide, audioCtx.currentTime + dur);
-                }
-                gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-                osc.connect(gain); 
-                gain.connect(audioCtx.destination);
-                osc.start(); 
-                osc.stop(audioCtx.currentTime + dur);
-            } catch(e) {}
-        }
-
-        function soundFx(type) {
-            if (type === 'punch') playTone(180, 'triangle', 0.12, 0.5, 60);
-            if (type === 'bigpunch') playTone(120, 'sawtooth', 0.25, 0.7, 30);
-            if (type === 'kick') playTone(150, 'triangle', 0.15, 0.55, 40);
-            if (type === 'jump') playTone(200, 'sine', 0.18, 0.3, 400);
-            if (type === 'block') playTone(90, 'square', 0.1, 0.4, 80);
-            if (type === 'hit') playTone(320, 'sawtooth', 0.1, 0.6, 100);
-        }
-
-        function playProjectileSound(characterKey, isPlayerLaunched) {
-            if (!isPlayerLaunched) {
-                if (state.currentLevel === 1) playTone(1200, 'square', 0.25, 0.5, 200); 
-                if (state.currentLevel === 2) playTone(750, 'sine', 0.1, 0.45, 1100);  
-                if (state.currentLevel === 3) playTone(90, 'sawtooth', 0.45, 0.85, 35); 
-                return;
-            }
-            switch(characterKey) {
-                case 'speedways': playTone(850, 'triangle', 0.15, 0.8, 250); break;
-                case 'lee': playTone(950, 'sine', 0.12, 0.75, 1400); break;
-                case 'dom': playTone(190, 'sawtooth', 0.35, 0.95, 75); break;
-                case 'spaniard': playTone(400, 'square', 0.22, 0.85, 200); break;
-                case 'catterson': playTone(1300, 'sine', 0.09, 0.75, 2400); break;
-                case 'jeff': playTone(380, 'sawtooth', 0.28, 0.85, 800); break;
-            }
-        }
-
-        function playBeatStep() {
-            if (!state.gameActive) return;
-            state.musicStep = (state.musicStep + 1) % 8;
-            let bassNotes = [55, 55, 65, 55, 73, 55, 65, 49];
-            if (state.musicStep % 2 === 0) playTone(bassNotes[state.musicStep], 'triangle', 0.2, 0.2);
-            if (state.musicStep === 2 || state.musicStep === 6) playTone(220, 'square', 0.06, 0.08, 80);
-        }
-
-        function scaleGameWindow() {
-            const wrapper = document.getElementById('canvas-scaler');
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            let scale = Math.min(w / 820, h / 420);
-            if (scale > 1) scale = 1; 
-            wrapper.style.transform = `scale(${scale})`;
-        }
-        window.addEventListener('resize', scaleGameWindow);
-        window.addEventListener('load', scaleGameWindow);
-
-        function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-        }
-
-        function selectCharacter(charKey) {
-            state.playerCharKey = charKey;
-            showScreen('diff-screen');
-        }
-
-        const keys = { Left: false, Right: false, Duck: false, Block: false };
-
-        window.addEventListener('keydown', e => {
-            if(!state.gameActive) return;
-            initAudio();
-            if(e.code === 'KeyA' || e.code === 'ArrowLeft') keys.Left = true;
-            if(e.code === 'KeyD' || e.code === 'ArrowRight') keys.Right = true;
-            if(e.code === 'KeyS' || e.code === 'ArrowDown') keys.Duck = true;
-            if(e.code === 'Space') keys.Block = true;
-            
-            if((e.code === 'KeyW' || e.code === 'ArrowUp') && !player.isJumping && !player.isDucking && !player.isBlocking) {
-                player.vy = -14; player.isJumping = true; soundFx('jump');
-            }
-            if(e.code === 'KeyJ') performAttack('punch');
-            if(e.code === 'KeyU') performAttack('big-punch');
-            if(e.code === 'KeyK') performAttack('kick');
-            if(e.code === 'KeyL') fireProjectile(true);
-        });
-
-        window.addEventListener('keyup', e => {
-            if(e.code === 'KeyA' || e.code === 'ArrowLeft') keys.Left = false;
-            if(e.code === 'KeyD' || e.code === 'ArrowRight') keys.Right = false;
-            if(e.code === 'KeyS' || e.code === 'ArrowDown') keys.Duck = false;
-            if(e.code === 'Space') keys.Block = false;
-        });
-
-        function bindTouchControl(elementId, actionCallbackOrKeyState, isKeyMode = false, keyTargetStr = "") {
-            const el = document.getElementById(elementId);
-            el.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                initAudio();
-                if (isKeyMode) { keys[keyTargetStr] = true; } 
-                else { actionCallbackOrKeyState(); }
-            }, { passive: false });
-
-            el.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                if (isKeyMode) keys[keyTargetStr] = false;
-            }, { passive: false });
-        }
-
-        bindTouchControl('btn-left', null, true, 'Left');
-        bindTouchControl('btn-right', null, true, 'Right');
-        bindTouchControl('btn-duck', null, true, 'Duck');
-        bindTouchControl('btn-block', null, true, 'Block');
-        
-        bindTouchControl('btn-jump', () => {
-            if (!player.isJumping && !player.isDucking && !player.isBlocking) {
-                player.vy = -14; player.isJumping = true; soundFx('jump');
-            }
-        });
-        bindTouchControl('btn-punch', () => performAttack('punch'));
-        bindTouchControl('btn-big', () => performAttack('big-punch'));
-        bindTouchControl('btn-kick', () => performAttack('kick'));
-        bindTouchControl('btn-proj', () => fireProjectile(true));
-
-        function attachDomUIEvents() {
-            document.getElementById('btn-core-start').onclick = () => { initAudio(); showScreen('char-select-screen'); };
-            document.getElementById('btn-core-lead').onclick = () => { initAudio(); showScreen('leaderboard-screen'); };
-            document.getElementById('btn-char-back').onclick = () => showScreen('home-screen');
-            document.getElementById('btn-exit-home').onclick = () => returnToHome();
-            document.getElementById('btn-lead-back').onclick = () => returnToHome();
-            document.getElementById('btn-save-score').onclick = () => showLeaderboardInput();
-
-            document.querySelectorAll('.char-btn').forEach(btn => {
-                btn.onclick = () => selectCharacter(btn.getAttribute('data-char'));
-            });
-            document.querySelectorAll('.diff-btn').forEach(btn => {
-                btn.onclick = () => startGame(btn.getAttribute('data-diff'));
-            });
-        }
-        attachDomUIEvents();
-
-        function startGame(difficulty) {
-            initAudio();
-            state.difficulty = difficulty; state.currentLevel = 1; state.score = 0; state.activeProjectiles = [];
-            document.getElementById('projectile-layer').innerHTML = '';
-            
-            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-            document.getElementById('hud').classList.remove('hidden');
-            document.getElementById('player').classList.remove('hidden');
-            document.getElementById('enemy').classList.remove('hidden');
-            
-            state.gameActive = true;
-            setupLevel(state.currentLevel);
-            
-            clearInterval(state.timerInterval); clearInterval(state.musicInterval);
-            state.timeLeft = 60; document.getElementById('timer').innerText = state.timeLeft;
-            
-            state.timerInterval = setInterval(() => {
-                if(!state.gameActive) return;
-                state.timeLeft--; document.getElementById('timer').innerText = state.timeLeft;
-                if(state.timeLeft <= 0) endGame(false, "TIME UP!");
-            }, 1000);
-            state.musicInterval = setInterval(playBeatStep, 220);
-
-            scaleGameWindow();
-            window.requestAnimationFrame(updateFrameLoop);
-        }
-
-        function setupLevel(lvl) {
-            const eData = levelData[lvl];
-            const pData = charData[state.playerCharKey];
-            
-            player.health = 100; player.x = 100; player.y = 0; player.vx = 0; player.vy = 0;
-            player.isAttacking = false; player.isDucking = false; player.isBlocking = false; player.isJumping = false;
-            
-            enemy.health = eData.health; enemy.x = 600; enemy.y = 0; enemy.vy = 0;
-            enemy.isAttacking = false; enemy.isJumping = false;
-            
-            state.activeProjectiles = [];
-            document.getElementById('projectile-layer').innerHTML = '';
-
-            document.getElementById('level-badge').innerText = `LEVEL ${lvl}`;
-            document.getElementById('player-info').innerText = pData.name;
-            document.getElementById('enemy-info').innerText = `${eData.name} [Lv ${lvl}]`;
-            
-            const pEl = document.getElementById('player');
-            pEl.style.setProperty('--char-color', pData.color);
-            pEl.className = `fighter ${pData.theme}`;
-            
-            const eEl = document.getElementById('enemy');
-            eEl.style.setProperty('--char-color', eData.color);
-            eEl.className = `fighter ${eData.theme}`;
-            
-            updateVisuals();
-        }
-
-        function updateFrameLoop() {
-            if(!state.gameActive) return;
-            const pEl = document.getElementById('player'); const eEl = document.getElementById('enemy');
-            
-            player.isDucking = keys.Duck && !player.isJumping;
-            player.isBlocking = keys.Block && !player.isDucking && !player.isJumping;
-            
-            pEl.classList.toggle('anim-duck', player.isDucking); 
-            pEl.classList.toggle('anim-block', player.isBlocking);
-
-            if(player.isJumping) { player.vy += config.gravity; player.y += player.vy; if(player.y >= 0) { player.y = 0; player.isJumping = false; player.vy = 0; } }
-            if(enemy.isJumping) { enemy.vy += config.gravity; enemy.y += enemy.vy; if(enemy.y >= 0) { enemy.y = 0; enemy.isJumping = false; enemy.vy = 0; } }
-
-            player.vx = 0;
-            if(!player.isDucking && !player.isBlocking && !player.isAttacking) {
-                if(keys.Left) player.vx = -config.baseSpeed;
-                if(keys.Right) player.vx = config.baseSpeed;
-            }
-            player.x += player.vx;
-            
-            if(player.x < 0) player.x = 0;
-            if(player.x > enemy.x - 55) player.x = enemy.x - 55;
-
-            processEnemyAI();
-            processProjectiles();
-
-            pEl.style.transform = `translate(${player.x}px, ${player.y}px)`;
-            eEl.style.transform = `translate(${enemy.x}px, ${enemy.y}px)`;
-
-            window.requestAnimationFrame(updateFrameLoop);
-        }
-
-        function processEnemyAI() {
-            const ai = levelData[state.currentLevel];
-            let spd = ai.aiSpeed; let atkInt = 1400; let projChance = 0.02;
-            if (state.difficulty === 'easy') { spd *= 0.4; atkInt = 2600; projChance = 0.005; } 
-            else if (state.difficulty === 'hard') { spd *= 1.35; atkInt = 750; projChance = 0.05; }
-
-            const dist = enemy.x - player.x;
-
-            if (!enemy.isAttacking) {
-                if(dist > 75) enemy.x -= spd;
-                else if (dist < 60) enemy.x += spd;
-            }
-            if(enemy.x > config.width - 90) enemy.x = config.width - 90;
-
-            const now = Date.now();
-            if(dist <= 95 && (now - enemy.lastAttackTime > atkInt)) {
-                performEnemyAttack(dist);
-            }
-            else if (dist > 200 && now - enemy.lastProj > 1800 && Math.random() < projChance) {
-                fireProjectile(false);
-            }
-        }
-
-        function fireProjectile(isPlayer) {
-            const now = Date.now();
-            const source = isPlayer ? player : enemy;
-            if(source.isAttacking || source.isBlocking || source.isDucking) return;
-            if(isPlayer && now - player.lastProj < 800) return; 
-            
-            source.isAttacking = true; source.lastProj = now;
-            playProjectileSound(state.playerCharKey, isPlayer);
-            
-            const el = document.getElementById(isPlayer ? 'player' : 'enemy');
-            el.classList.add('anim-throw');
-
-            const symbol = isPlayer ? charData[state.playerCharKey].proj : levelData[state.currentLevel].proj;
-            const px = isPlayer ? source.x + 55 : source.x - 15;
-            const py = 300 + source.y; 
-
-            const pDiv = document.createElement('div');
-            pDiv.className = 'projectile'; pDiv.innerText = symbol;
-            document.getElementById('projectile-layer').appendChild(pDiv);
-
-            state.activeProjectiles.push({
-                isPlayer: isPlayer, x: px, y: py,
-                vx: isPlayer ? 11 : -11,
-                el: pDiv, active: true
-            });
-
-            setTimeout(() => { el.classList.remove('anim-throw'); source.isAttacking = false; }, 250);
-        }
-
-        function processProjectiles() {
-            state.activeProjectiles.forEach(p => {
-                if(!p.active) return;
-                p.x += p.vx;
-                p.el.style.transform = `translate(${p.x}px, ${p.y}px)`;
-
-                const target = p.isPlayer ? enemy : player;
-                const tx = target.x;
-                
-                let hit = false;
-                if(p.isPlayer && p.x > tx && p.x < tx + 60) hit = true;
-                if(!p.isPlayer && p.x < tx + 60 && p.x > tx) hit = true;
-
-                if(hit) {
-                    p.active = false; p.el.remove();
-                    
-                    if(!p.isPlayer && player.isDucking) return; 
-                    if(!p.isPlayer && player.isBlocking) { soundFx('block'); target.health -= 2; }
-                    else {
-                        soundFx('hit'); target.health -= 15;
-                        const tel = document.getElementById(p.isPlayer ? 'enemy' : 'player');
-                        tel.classList.add('hit-flash'); setTimeout(() => tel.classList.remove('hit-flash'), 120);
-                        if(p.isPlayer) state.score += 15 * (state.difficulty === 'hard' ? 3 : 1);
-                    }
-                    checkMatch();
-                } else if (p.x < -50 || p.x > config.width + 50) {
-                    p.active = false; p.el.remove();
-                }
-            });
-            state.activeProjectiles = state.activeProjectiles.filter(p => p.active);
-        }
-
-        function performAttack(type) {
-            if(!state.gameActive || player.isAttacking || player.isDucking || player.isBlocking) return;
-            player.isAttacking = true;
-            const pEl = document.getElementById('player'); pEl.classList.add(`anim-${type}`);
-            
-            if(type === 'punch') soundFx('punch');
-            if(type === 'big-punch') soundFx('bigpunch');
-            if(type === 'kick') soundFx('kick');
-
-            const dist = enemy.x - player.x;
-            let rng = type === 'big-punch' ? 120 : 100;
-
-            if(dist > 0 && dist <= rng) {
-                let dmg = type === 'big-punch' ? 22 : (type === 'kick' ? 14 : 10);
-                enemy.health -= dmg;
-                state.score += dmg * (state.difficulty === 'hard' ? 3 : state.difficulty === 'medium' ? 2 : 1);
-                soundFx('hit');
-                const eEl = document.getElementById('enemy'); eEl.classList.add('hit-flash');
-                setTimeout(() => eEl.classList.remove('hit-flash'), 120);
-            }
-
-            setTimeout(() => { pEl.classList.remove(`anim-${type}`); player.isAttacking = false; checkMatch(); }, type === 'big-punch' ? 350 : 220);
-        }
-
-        function performEnemyAttack(dist) {
-            enemy.lastAttackTime = Date.now(); enemy.isAttacking = true;
-            const eEl = document.getElementById('enemy');
-            
-            let atkType = Math.random() > 0.6 ? 'anim-kick' : 'anim-punch';
-            if(state.currentLevel === 3 && Math.random() > 0.6) atkType = 'anim-big-punch';
-            
-            eEl.classList.add(atkType);
-            soundFx(atkType.includes('big') ? 'bigpunch' : (atkType.includes('kick') ? 'kick' : 'punch'));
-
-            if(dist > 0 && dist <= 100) {
-                if (player.isDucking && atkType !== 'anim-kick') {} 
-                else {
-                    let bdmg = state.currentLevel === 3 ? 16 : 11;
-                    if(atkType === 'anim-big-punch') bdmg = 24;
-                    if(state.difficulty === 'easy') bdmg *= 0.45; if(state.difficulty === 'hard') bdmg *= 1.5;
-                    
-                    if (player.isBlocking) { bdmg *= 0.15; soundFx('block'); } 
-                    else {
-                        soundFx('hit'); const pEl = document.getElementById('player');
-                        pEl.classList.add('hit-flash'); setTimeout(() => pEl.classList.remove('hit-flash'), 120);
-                    }
-                    player.health -= Math.round(bdmg);
-                }
-            }
-            setTimeout(() => { eEl.classList.remove(atkType); enemy.isAttacking = false; checkMatch(); }, 250);
-        }
-
-        function updateVisuals() {
-            document.getElementById('player-fill').style.width = `${Math.max(0, player.health)}%`;
-            const mHp = levelData[state.currentLevel].health;
-            document.getElementById('enemy-fill').style.width = `${Math.max(0, (enemy.health / mHp) * 100)}%`;
-        }
-
-        function checkMatch() {
-            updateVisuals();
-            if(player.health <= 0) { playTone(150, 'sawtooth', 0.8, 0.5, 40); endGame(false, "YOU LOSE"); }
-            else if(enemy.health <= 0) {
-                if(state.currentLevel < 3) {
-                    playTone(400, 'sine', 0.4, 0.3, 600);
-                    state.currentLevel++; setupLevel(state.currentLevel);
-                } else {
-                    playTone(300, 'sine', 0.2, 0.4, 500); setTimeout(() => playTone(500, 'sine', 0.5, 0.4, 900), 150);
-                    endGame(true, "CHAMPION VICTORY!");
-                }
-            }
-        }
-
-        function endGame(isWin, msg) {
-            state.gameActive = false; clearInterval(state.timerInterval); clearInterval(state.musicInterval);
-            document.getElementById('hud').classList.add('hidden');
-            document.getElementById('player').classList.add('hidden');
-            document.getElementById('enemy').classList.add('hidden');
-            document.getElementById('win-loss-title').innerText = msg;
-            document.getElementById('score-reporting').innerText = `Final Score: ${state.score}`;
-            showScreen('gameover-screen');
-        }
-
-        function showLeaderboardInput() {
-            let initials = prompt("Enter your name:", "PLAYER");
-            if (!initials) initials = "UNKNOWN";
-            leaderboard.push({ name: initials.substring(0,10).toUpperCase(), level: state.currentLevel, score: state.score, diff: state.difficulty.toUpperCase() });
-            leaderboard.sort((a,b) => b.score - a.score);
-            
-            const tbody = document.getElementById('leaderboard-body'); tbody.innerHTML = "";
-            leaderboard.forEach((r,i) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>#${i+1}</td><td>${r.name}</td><td>Lv ${r.level}</td><td style="color:#ffd700;">${r.score}</td>`;
-                tbody.appendChild(tr);
-            });
-            showScreen('leaderboard-screen');
-        }
-
-        function returnToHome() { 
-            state.gameActive = false;
-            clearInterval(state.timerInterval); clearInterval(state.musicInterval);
-            document.getElementById('hud').classList.add('hidden');
-            document.getElementById('player').classList.add('hidden');
-            document.getElementById('enemy').classList.add('hidden');
-            showScreen('home-screen'); 
-        }
-    </script>
-</body>
-</html>
+            'catterson': { name: "Catterson", color: "#008000", theme: "theme-catterson
