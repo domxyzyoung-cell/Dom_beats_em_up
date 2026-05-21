@@ -2,372 +2,362 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Dom beats em up.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dom beats them up.</title>
     <style>
         * {
-            box-sizing: border-box; 
-            user-select: none; 
-            -webkit-user-select: none; 
-            margin: 0; 
-            padding: 0;
-            touch-action: none; /* Strict scroll-lock for mobile responsiveness */
+            box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0;
+            touch-action: none;
         }
         body {
-            background-color: #050508; 
-            font-family: 'Courier New', Courier, monospace; 
-            color: #fff;
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100dvh;
-            width: 100vw;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            background-color: #05050a; font-family: 'Courier New', Courier, monospace; color: #fff;
+            overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;
         }
-        
-        #canvas-scaler {
-            display: flex; align-items: center; justify-content: center;
-            transform-origin: center center; transition: transform 0.1s ease-out;
-            width: 100%; height: 100%;
-        }
-
-        #screen-constrain-box {
-            position: relative; width: 820px; height: 520px;
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: flex-start; flex-shrink: 0;
-        }
-
-        /* Dynamic Background Pulse & Juice Shake */
         #game-container {
-            position: relative; width: 800px; height: 380px;
-            background: linear-gradient(to bottom, #2b324c 0%, #47547a 50%, #1a1e2e 100%);
-            background-size: 200% 200%;
-            animation: bgPulse 8s ease infinite;
-            border: 4px solid #444; overflow: hidden; 
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8); flex-shrink: 0; 
-            transition: transform 0.05s;
+            position: relative; width: 800px; height: 400px;
+            background: linear-gradient(to bottom, #0f1326 0%, #171b30 60%, #05060a 100%);
+            border: 4px solid #3a3f58; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+            border-radius: 8px;
         }
         
-        @keyframes bgPulse {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; filter: brightness(1.1); }
-            100% { background-position: 0% 50%; }
-        }
-
+        /* Screens configuration */
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(8, 8, 14, 0.96); z-index: 20;
+            background: rgba(5, 5, 10, 0.96); z-index: 20;
         }
         .hidden { display: none !important; }
         
-        h1 { font-size: 3.2rem; color: #ff2a35; text-shadow: 0 0 15px rgba(255,42,53,0.7); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 3px; font-weight: 900; text-align: center; }
-        h2 { font-size: 1.4rem; color: #ffd700; margin-bottom: 15px; }
-        .menu-group { display: flex; flex-direction: column; gap: 12px; width: 300px; }
-        .char-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; max-width: 620px; }
+        h1 {
+            font-size: 3rem; color: #ff2a35; text-shadow: 0 0 15px rgba(255,42,53,0.6);
+            margin-bottom: 20px; text-transform: uppercase; letter-spacing: 4px; font-weight: 900; text-align: center;
+        }
+        h2 { font-size: 1.5rem; color: #ffd700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        .menu-group { display: flex; flex-direction: column; gap: 15px; width: 280px; }
+        .char-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; max-width: 600px; }
         
-        button { padding: 12px 18px; font-size: 1.1rem; font-family: inherit; background: #1a1a26; color: #fff; border: 2px solid #555; cursor: pointer; transition: all 0.2s; text-transform: uppercase; font-weight: bold; border-radius: 4px; }
-        button:hover, button:active { background: #ff2a35; border-color: #fff; box-shadow: 0 0 15px rgba(255,42,53,0.6); }
-        .char-btn { font-size: 0.95rem; padding: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px;}
-        .char-btn span { font-size: 22px; }
+        button {
+            padding: 14px 20px; font-size: 1.1rem; font-family: inherit; background: #141724;
+            color: #fff; border: 2px solid #4a4f6d; cursor: pointer; transition: all 0.2s ease; text-transform: uppercase;
+            font-weight: bold; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        button:hover { background: #ff2a35; border-color: #fff; box-shadow: 0 0 20px rgba(255,42,53,0.7); transform: translateY(-2px); }
+        .char-btn { font-size: 0.95rem; padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 6px;}
+        .char-btn span { font-size: 26px; }
         
-        .fit-frame-trigger { position: absolute; bottom: 10px; right: 10px; font-size: 0.75rem; padding: 4px 8px; background: rgba(0,0,0,0.5); border: 1px solid #666; z-index: 99; color: #aaa; }
-
-        #hud { position: absolute; top: 0; left: 0; width: 100%; padding: 12px; display: flex; justify-content: space-between; align-items: center; z-index: 5; }
-        .health-bar-container { width: 36%; height: 22px; background: #222; border: 2px solid #fff; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .health-fill { height: 100%; width: 100%; background: #2ecc71; transition: width 0.05s ease-out; }
+        /* HUD UI */
+        #hud {
+            position: absolute; top: 0; left: 0; width: 100%; padding: 15px;
+            display: flex; justify-content: space-between; align-items: center; z-index: 5;
+        }
+        .health-bar-container { width: 36%; height: 22px; background: #1a1a26; border: 2px solid #fff; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-radius: 3px; }
+        .health-fill { height: 100%; width: 100%; background: #2ecc71; transition: width 0.1s ease-out; }
         #enemy-fill { background: #e74c3c; float: right; }
-        .char-info { position: absolute; top: -18px; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; color: #ddd; letter-spacing: 1px; }
-        #enemy-info { right: 0; }
-        #match-stats { text-align: center; font-size: 1.4rem; font-weight: bold; text-shadow: 0 2px 4px #000; display: flex; flex-direction: column; align-items: center; }
-        #level-badge { color: #ffd700; font-size: 0.85rem; display: block; margin-top: 1px; }
+        .char-info { position: absolute; top: -22px; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; color: #cbd5e1; letter-spacing: 1px; text-shadow: 0 2px 4px #000; }
+        #enemy-info { right: 0; text-align: right; }
+        #match-stats { text-align: center; font-size: 1.6rem; font-weight: bold; text-shadow: 0 2px 5px #000; min-width: 100px; }
+        #level-badge { color: #ffd700; font-size: 0.85rem; display: block; margin-top: 3px; letter-spacing: 1px; }
 
-        /* Floating UI Elements */
-        .floating-text { position: absolute; font-weight: bold; font-size: 1.2rem; pointer-events: none; animation: floatUp 0.8s ease-out forwards; z-index: 30; }
-        .combo-text { color: #f39c12; font-size: 1.5rem; font-style: italic; text-shadow: 0 2px 5px #000; }
-        .whoosh-text { color: #00f3ff; font-size: 1rem; }
-        .progression-text { color: #2ecc71; font-size: 2rem; text-shadow: 0 0 10px #2ecc71; text-align: center; margin-top: 20px;}
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-40px) scale(1.2); } }
+        /* Fighter Base Dynamics (Perfect Symmetrical Line Alignment) */
+        .fighter {
+            position: absolute; bottom: 20px; width: 110px; height: 140px;
+            transition: transform 0.02s linear; transform-origin: bottom center;
+        }
+        
+        /* Core wrapper that centers the skeleton perfectly */
+        .sprite {
+            position: relative; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        #enemy .sprite { transform: scaleX(-1); }
 
-        .fighter { position: absolute; bottom: 20px; width: 90px; height: 130px; transform-origin: bottom center; }
-        .sprite { position: relative; width: 100%; height: 100%; transform: scale(var(--c-scale, 1)); transform-origin: bottom center; }
-        #enemy .sprite { transform: scaleX(-1) scale(var(--c-scale, 1)); }
-
-        /* Refined Centerline Geometry */
-        .head { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--char-color); background: #111; z-index: 3; }
-        .eyes { position: absolute; top: 8px; right: 4px; display: flex; gap: 4px; }
+        /* Anatomy block positioning aligned cleanly on vertical line axis */
+        .head {
+            position: relative; width: 34px; height: 34px;
+            border-radius: 50%; border: 3px solid var(--char-color); background: #111; z-index: 3;
+            margin-top: 8px; flex-shrink: 0;
+        }
+        .eyes { position: absolute; top: 8px; right: 4px; display: flex; gap: 3px; }
         .eye { width: 4px; height: 4px; background: var(--eye-color, #fff); border-radius: 50%; }
         
-        .torso { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); width: var(--torso-width, 14px); height: 42px; background: var(--torso-color, var(--char-color)); z-index: 2; border-radius: 4px; }
+        .torso {
+            position: relative; width: var(--torso-width, 16px); height: 46px;
+            background: var(--torso-color, var(--char-color)); z-index: 2; border-radius: 4px;
+            margin-top: -1px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+        }
         
-        .arm { position: absolute; top: 44px; left: 50%; width: var(--arm-width, 38px); height: 7px; background: var(--char-color); transform-origin: 0 50%; z-index: 4; transition: transform 0.08s, width 0.08s; border-radius: 3px; }
-        .arm-left { transform: translateX(-50%) rotate(140deg); }
-        .arm-right { transform: translateX(-50%) rotate(40deg); }
+        /* Symmetrical Appendages calculated from Center line */
+        .arm {
+            position: absolute; top: 44px; width: var(--arm-width, 38px); height: 6px;
+            background: var(--limb-color, var(--char-color)); z-index: 4;
+            transition: transform 0.08s, width 0.08s; border-radius: 3px;
+        }
+        .arm-left { right: calc(50% + var(--torso-width, 16px) / 2 - 4px); transform-origin: right center; transform: rotate(135deg); }
+        .arm-right { left: calc(50% + var(--torso-width, 16px) / 2 - 4px); transform-origin: left center; transform: rotate(45deg); }
         
-        .leg { position: absolute; top: 78px; left: 50%; width: 44px; height: 7px; background: var(--char-color); transform-origin: 0 50%; z-index: 1; transition: transform 0.08s; border-radius: 3px; }
-        .leg-left { transform: translateX(-50%) rotate(105deg); }
-        .leg-right { transform: translateX(-50%) rotate(75deg); }
+        .leg {
+            position: absolute; top: 87px; width: 7px; height: 46px;
+            background: var(--limb-color, var(--char-color)); z-index: 1;
+            transition: transform 0.08s; border-radius: 3px; transform-origin: center top;
+        }
+        .leg-left { left: calc(50% - 7px); transform: rotate(12deg); }
+        .leg-right { right: calc(50% - 7px); transform: rotate(-12deg); }
 
+        /* --- CHARACTER SPECIFIC ACCESSORIES & COSTUMES --- */
         .accessory { display: none; position: absolute; }
 
-        .theme-speedways { --c-scale: 1.0; }
-        .theme-speedways .acc-hat { display: block; top: -5px; left: 50%; transform: translateX(-50%); width: 36px; height: 6px; background: #000; border-radius: 1px; z-index: 5;}
-        .theme-speedways .acc-hat::after { content:''; position: absolute; top: -8px; left: 6px; border-bottom: 8px solid #000; border-left: 12px solid transparent; border-right: 12px solid transparent;}
+        /* Speedways */
+        .theme-speedways .acc-hat { display: block; top: -6px; left: 50%; width: 38px; height: 6px; background: #000; border-radius: 1px; z-index: 5; transform: translateX(-50%); }
+        .theme-speedways .acc-hat::after { content:''; position: absolute; top: -8px; left: 7px; border-bottom: 8px solid #000; border-left: 12px solid transparent; border-right: 12px solid transparent;}
         
-        .theme-lee { --c-scale: 1.0; }
-        .theme-lee .acc-mask { display: block; top: 4px; left: -2px; width: 34px; height: 12px; background: #e51b24; z-index: 4; opacity: 0.9;}
-        .theme-lee .torso { background: linear-gradient(to bottom, #111 38%, #e51b24 38%, #e51b24 62%, #111 62%); } 
+        /* Premium Costume Logic for Lee & Blue Ninja */
+        .theme-lee { --char-color: #111; --torso-color: #111; --limb-color: #111; }
+        .theme-lee .acc-mask { display: block; top: 6px; left: -2px; width: 34px; height: 10px; background: #e51b24; z-index: 4; }
+        .theme-lee .acc-bow { display: block; top: 8px; left: -8px; width: 10px; height: 8px; background: #e51b24; z-index: 4; clip-path: polygon(0 0, 100% 50%, 0 100%, 30% 50%); }
+        .theme-lee .acc-belt { display: block; bottom: 6px; width: calc(var(--torso-width, 16px) + 4px); height: 6px; background: #e51b24; z-index: 5; }
+        .theme-lee .arm::after { content: ''; position: absolute; right: 0; top: 0; width: 8px; height: 100%; background: #e51b24; border-radius: 50%; }
+        .theme-lee .arm-left::after { left: 0; right: auto; }
+        .theme-lee .leg::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 8px; background: #e51b24; border-radius: 1px; }
 
-        .theme-dom { --c-scale: 1.15; }
-        .theme-dom .torso { width: 20px; background: linear-gradient(to bottom, #008C45 33%, #F4F5F0 33%, #F4F5F0 66%, #CD212A 66%); }
-        .theme-dom .arm { width: 42px; height: 8px; }
+        .theme-ninja-enemy { --char-color: #111; --torso-color: #111; --limb-color: #111; }
+        .theme-ninja-enemy .acc-mask { display: block; top: 6px; left: -2px; width: 34px; height: 10px; background: #0033ff; z-index: 4; }
+        .theme-ninja-enemy .acc-bow { display: block; top: 8px; left: -8px; width: 10px; height: 8px; background: #0033ff; z-index: 4; clip-path: polygon(0 0, 100% 50%, 0 100%, 30% 50%); }
+        .theme-ninja-enemy .acc-belt { display: block; bottom: 6px; width: calc(var(--torso-width, 16px) + 4px); height: 6px; background: #0033ff; z-index: 5; }
+        .theme-ninja-enemy .arm::after { content: ''; position: absolute; right: 0; top: 0; width: 8px; height: 100%; background: #0033ff; border-radius: 50%; }
+        .theme-ninja-enemy .arm-left::after { left: 0; right: auto; }
+        .theme-ninja-enemy .leg::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 8px; background: #0033ff; border-radius: 1px; }
 
-        .theme-spaniard { --c-scale: 0.5; }
-        .theme-spaniard .torso { width: 14px; background: linear-gradient(to bottom, #AA151B 25%, #F1BF00 25%, #F1BF00 75%, #AA151B 75%); }
+        /* Dom */
+        .theme-dom { transform: scale(1.15) !important; }
+        .theme-dom .torso { width: 18px; --torso-width: 18px; background: linear-gradient(to bottom, #008C45 33%, #F4F5F0 33%, #F4F5F0 66%, #CD212A 66%); }
+        .theme-dom .arm { width: 40px; height: 7px; }
 
-        .theme-catterson { --c-scale: 1.0; }
-        .theme-catterson .acc-clover { display: block; top: 8px; left: -10px; color: #008000; font-size: 20px; text-shadow: 0 0 2px #fff; width: 20px; height: 20px;}
+        /* Spaniard */
+        .theme-spaniard { transform: scale(0.75) !important; }
+        .theme-spaniard .torso { width: 14px; --torso-width: 14px; background: linear-gradient(to bottom, #AA151B 25%, #F1BF00 25%, #F1BF00 75%, #AA151B 75%); }
 
-        /* Jeff (White helmet, black eyes, brown driving gloves) */
-        .theme-jeff { --c-scale: 1.0; }
-        .theme-jeff .head { background: #ffffff; border-color: #dddddd; }
-        .theme-jeff .eye { background: #000000; }
-        .theme-jeff .acc-visor { display: block; top: 8px; left: 14px; width: 18px; height: 10px; background: #111; border: 1px solid #444; border-radius: 2px; }
-        .theme-jeff .arm::after { content: ''; position: absolute; right: 0; top: 0; width: 12px; height: 100%; background: #8b4513; border-radius: 2px; }
+        /* Catterson */
+        .theme-catterson .acc-clover { display: block; top: 12px; color: #008000; font-size: 18px; font-weight: bold; text-shadow: 0 0 2px #fff; }
 
-        .wings { display: none; position: absolute; top: 2px; left: 50%; transform: translateX(-50%); width: 90px; height: 30px; pointer-events: none; z-index: -1; }
-        .wing-l, .wing-r { position: absolute; width: 45px; height: 25px; background: var(--wing-color, #fff); border-radius: 20px 40px 10px 30px; opacity: 0.85; box-shadow: 0 0 8px var(--wing-color, #fff); }
-        .wing-l { right: 50%; transform-origin: right center; transform: rotate(15deg); }
-        .wing-r { left: 50%; transform-origin: left center; transform: scaleX(-1) rotate(15deg); }
+        /* Jeff */
+        .theme-jeff .head { background: #222; border-color: #444; }
+        .theme-jeff .acc-visor { display: block; top: 8px; right: 2px; width: 16px; height: 8px; background: #ffd700; border-radius: 2px; z-index: 4; }
 
-        .theme-angel { --c-scale: 1.0; }
+        /* Dynamic Boss: Drogon Style Profiles */
+        .theme-drogon { transform: scale(1.5) !important; --char-color: #111; --torso-color: #111; --limb-color: #111; }
+        .theme-drogon .head { background: #000; border: 3px solid #ff6a00; box-shadow: 0 0 10px #ff6a00; }
+        .theme-drogon .eye { background: #ff0000; box-shadow: 0 0 6px #ff0000; }
+        .theme-drogon .acc-mouth { display: block; bottom: 4px; right: 4px; width: 10px; height: 4px; background: #ff0000; border-radius: 2px; }
+        .theme-drogon .torso { background: #000; border: 2px solid #ff6a00; box-shadow: 0 0 12px #ff6a00; width: 22px; --torso-width: 22px; }
+        .theme-drogon .arm, .theme-drogon .leg { background: #000; border: 1px solid #ff6a00; }
+        .theme-drogon .wings { display: block !important; top: 15px; }
+
+        /* Standard Stage Elements */
         .theme-angel .halo, .theme-angel .wings { display: block; --wing-color: #ffffff; }
-        
-        .theme-ninja-enemy { --c-scale: 1.0; }
-        .theme-ninja-enemy .acc-mask { display: block; background: #0033ff; top: 4px; left: -2px; width: 34px; height: 12px; opacity: 0.9; z-index: 4; }
-        .theme-ninja-enemy .leg::after { content: ''; position: absolute; right: 0; top: 0; width: 14px; height: 100%; background: #0033ff; border-radius: 2px; }
-        
-        .theme-devil { --c-scale: 1.5; --char-color: #800080; }
-        .theme-devil .horns, .theme-devil .wings { display: flex !important; }
-        .theme-devil .wings { --wing-color: #3a0202; }
-        .theme-devil .eye { background: #ffea00; }
+        .theme-devil .horns, .theme-devil .wings { display: block; --wing-color: #4a0000; }
 
-        .halo { display: none; position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 36px; height: 10px; border-radius: 50%; border: 3px solid #ffd700; box-shadow: 0 0 10px #ffd700; z-index: 5;}
-        .horns { display: none; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 32px; justify-content: space-between; z-index: 5; }
-        .horn { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 12px solid #ff2a35; transform: rotate(-15deg); }
-        .horn-r { transform: rotate(15deg); }
+        .halo { display: none; position: absolute; top: -8px; left: 50%; width: 34px; height: 8px; border-radius: 50%; border: 2px solid #ffd700; box-shadow: 0 0 8px #ffd700; z-index: 5; transform: translateX(-50%); }
+        .wings { display: none; position: absolute; top: 10px; width: 70px; height: 30px; opacity: 0.75; z-index: 0; }
+        .wing-l, .wing-r { position: absolute; width: 35px; height: 18px; border-radius: 50% 50% 0 0; background: var(--wing-color, #fff); transform-origin: bottom right;}
+        .wing-l { left: -8px; transform: rotate(-25deg); }
+        .wing-r { right: -8px; transform: scaleX(-1) rotate(-25deg); }
+        .horns { display: none; position: absolute; top: -6px; width: 100%; padding: 0 4px; display: flex; justify-content: space-between; z-index: 5;}
+        .horn { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-bottom: 10px solid #ff2a35; transform: rotate(-20deg); }
+        .horn-r { transform: rotate(20deg); }
 
-        /* Animation Poses */
-        .anim-punch .arm-right { transform: rotate(5deg) scaleX(1.3); width: 46px; background: #fff; box-shadow: 0 0 8px #fff; }
-        .anim-punch .torso { transform: translateX(-50%) rotate(8deg); }
-        .anim-big-punch .arm-right { transform: rotate(-5deg) scaleX(1.7); width: 55px; background: #ffaa00; box-shadow: 0 0 15px #ffaa00; }
-        .anim-big-punch .torso { transform: translateX(-50%) rotate(18deg); }
-        .anim-kick .leg-right { transform: rotate(-25deg) scaleX(1.4); width: 52px; background: #fff; box-shadow: 0 0 8px #fff; }
-        .anim-kick .torso { transform: translateX(-50%) rotate(-12deg); }
-        .anim-throw .arm-right { transform: rotate(-45deg) scaleX(1.5); background: #00f3ff; }
-        .anim-duck .sprite { transform: scale(var(--c-scale, 1)) translateY(45px) scaleY(0.55) !important; }
-        .anim-duck#enemy .sprite { transform: scaleX(-1) scale(var(--c-scale, 1)) translateY(45px) scaleY(0.55) !important; }
-        .anim-block .arm-left { transform: rotate(260deg) translate(5px, 12px); background: #55ff55; }
-        .anim-block .arm-right { transform: rotate(280deg) translate(-5px, -12px); background: #55ff55; }
+        /* --- ANIMATION ACTIONS --- */
+        .anim-punch .arm-right { transform: rotate(0deg) scaleX(1.4); width: 44px; background: #fff !important; box-shadow: 0 0 10px #fff; }
+        .anim-punch .torso { transform: rotate(10deg); }
         
-        /* Acrobatic Ninja Spin */
-        @keyframes ninjaSpin { 0% { transform: scale(var(--c-scale, 1)) rotate(0deg); } 100% { transform: scale(var(--c-scale, 1)) rotate(360deg); } }
-        .anim-spin { animation: ninjaSpin 0.6s linear infinite; }
+        .anim-big-punch .arm-right { transform: rotate(-10deg) scaleX(1.75); width: 52px; background: #ffaa00 !important; box-shadow: 0 0 15px #ffaa00; }
+        .anim-big-punch .torso { transform: rotate(20deg); }
+        
+        .anim-kick .leg-right { transform: rotate(-65deg) scaleX(1.3); width: 48px; background: #fff !important; box-shadow: 0 0 10px #fff; }
+        .anim-kick .torso { transform: rotate(-15deg); }
+
+        .anim-throw .arm-right { transform: rotate(-30deg) scaleX(1.4); background: #00f3ff !important; }
+        
+        .anim-duck .sprite { transform: translateY(40px) scaleY(0.6) !important; }
+        .anim-duck#enemy .sprite { transform: scaleX(-1) translateY(40px) scaleY(0.6) !important; }
+        
+        .anim-block .arm-left { transform: rotate(250deg) translate(4px, 8px); background: #55ff55 !important; }
+        .anim-block .arm-right { transform: rotate(290deg) translate(-4px, -8px); background: #55ff55 !important; }
+        
+        /* Aerial Spin Animation Configuration */
+        .jump-spin .sprite { animation: spinMatrix 0.45s linear infinite; }
+        @keyframes spinMatrix { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        #enemy.jump-spin .sprite { animation: spinMatrixEnemy 0.45s linear infinite; }
+        @keyframes spinMatrixEnemy { 
+            0% { transform: scaleX(-1) rotate(0deg); } 
+            100% { transform: scaleX(-1) rotate(-360deg); } 
+        }
 
         .hit-flash { filter: brightness(2.5) drop-shadow(0 0 12px #ff2a35); }
-        .projectile { position: absolute; z-index: 15; font-size: 28px; transition: transform 0.05s linear; }
-        
-        #mobile-controller-layer { width: 100%; height: 120px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; background: rgba(10, 10, 15, 0.4); border-radius: 8px; border: 1px solid #222; }
-        .control-pad { display: flex; gap: 8px; }
-        .touch-btn { width: 54px; height: 54px; background: rgba(26, 26, 38, 0.9); border: 2px solid rgba(255,255,255,0.4); border-radius: 50%; color: #fff; font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; justify-content: center; }
-        .touch-btn:active { background: #ff2a35; border-color: #fff; transform: scale(0.9); }
 
-        table { width: 85%; border-collapse: collapse; margin: 15px 0; }
-        th, td { padding: 6px; text-align: left; border-bottom: 1px solid #444; font-size: 0.9rem; }
+        /* Projectiles Layer System Fix */
+        #projectile-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 12;
+        }
+        .projectile {
+            position: absolute; left: 0; top: 0; z-index: 15; font-size: 32px;
+            text-shadow: 0 0 8px rgba(255,255,255,0.6); will-change: transform;
+        }
+        
+        table { width: 80%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #333; }
     </style>
 </head>
 <body>
 
-    <button class="fit-frame-trigger" id="fit-frame-cmd">⛶ Fit Frame</button>
+    <div id="game-container">
+        
+        <div id="projectile-layer"></div>
 
-    <div id="canvas-scaler">
-        <div id="screen-constrain-box">
-            
-            <div id="game-container">
-                <div id="projectile-layer"></div>
-
-                <div id="hud" class="hidden">
-                    <div class="health-bar-container">
-                        <span class="char-info" id="player-info">Player</span>
-                        <div id="player-fill" class="health-fill"></div>
-                    </div>
-                    <div id="match-stats">
-                        <div id="timer">60</div>
-                        <div id="level-badge">LEVEL 1</div>
-                    </div>
-                    <div class="health-bar-container">
-                        <span class="char-info" id="enemy-info">Enemy</span>
-                        <div id="enemy-fill" class="health-fill"></div>
-                    </div>
-                </div>
-
-                <div id="player" class="fighter hidden" style="--char-color: #3498db;">
-                    <div class="sprite" id="player-sprite">
-                        <div class="head">
-                            <div class="accessory acc-hat"></div>
-                            <div class="accessory acc-mask"></div>
-                            <div class="accessory acc-visor"></div>
-                            <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
-                        </div>
-                        <div class="torso">
-                            <div class="wings"><div class="wing-l"></div><div class="wing-r"></div></div>
-                            <div class="accessory acc-clover">♣</div>
-                            <div class="arm arm-left"></div>
-                            <div class="arm arm-right"></div>
-                            <div class="leg leg-left"></div>
-                            <div class="leg leg-right"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="enemy" class="fighter hidden" style="--char-color: #f1c40f;">
-                    <div class="sprite" id="enemy-sprite">
-                        <div class="head">
-                            <div class="halo"></div>
-                            <div class="horns"><div class="horn"></div><div class="horn horn-r"></div></div>
-                            <div class="accessory acc-mask"></div>
-                            <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
-                        </div>
-                        <div class="torso">
-                            <div class="wings"><div class="wing-l"></div><div class="wing-r"></div></div>
-                            <div class="arm arm-left"></div>
-                            <div class="arm arm-right"></div>
-                            <div class="leg leg-left"></div>
-                            <div class="leg leg-right"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="home-screen" class="screen">
-                    <h1>Dom beats em up.</h1>
-                    <div class="menu-group">
-                        <button id="btn-core-start">Start Game</button>
-                        <button id="btn-core-lead">Leaderboard</button>
-                    </div>
-                </div>
-
-                <div id="char-select-screen" class="screen hidden">
-                    <h1 style="font-size: 2rem;">Choose Your Fighter</h1>
-                    <div class="char-grid">
-                        <button class="char-btn" data-char="speedways"><span>📖</span>Speedways</button>
-                        <button class="char-btn" data-char="lee"><span>🍣</span>Lee</button>
-                        <button class="char-btn" data-char="dom"><span>🍕</span>Dom</button>
-                        <button class="char-btn" data-char="spaniard"><span>🥖</span>Spaniard</button>
-                        <button class="char-btn" data-char="catterson"><span>🔪</span>Catterson</button>
-                        <button class="char-btn" data-char="jeff"><span>🛞</span>Jeff</button>
-                    </div>
-                    <button style="margin-top:15px; background:#444;" id="btn-char-back">Back</button>
-                </div>
-
-                <div id="diff-screen" class="screen hidden">
-                    <h1 style="font-size: 2rem;">Select Difficulty</h1>
-                    <div class="menu-group">
-                        <button class="diff-btn" data-diff="easy">Easy</button>
-                        <button class="diff-btn" data-diff="medium">Medium</button>
-                        <button class="diff-btn" data-diff="hard">Hard</button>
-                    </div>
-                </div>
-
-                <div id="progression-screen" class="screen hidden" style="background: rgba(0,0,0,0.85);">
-                    <h1 style="color: #2ecc71;">VICTORY!</h1>
-                    <div id="progression-stats" class="progression-text"></div>
-                </div>
-
-                <div id="continue-screen" class="screen hidden">
-                    <h1 style="color: #e74c3c;">YOU LOSE</h1>
-                    <h2 style="color: #fff;">CONTINUE?</h2>
-                    <h1 id="continue-count" style="font-size: 5rem; color: #f1c40f; margin: 20px 0;">5</h1>
-                    <div class="menu-group" style="flex-direction: row; justify-content: center;">
-                        <button id="btn-continue-yes" style="background: #2ecc71; border-color: #27ae60;">YES!</button>
-                        <button id="btn-continue-no" style="background: #e74c3c; border-color: #c0392b;">GIVE UP</button>
-                    </div>
-                </div>
-
-                <div id="gameover-screen" class="screen hidden">
-                    <h1 id="win-loss-title">MATCH OVER</h1>
-                    <p id="score-reporting" style="margin-bottom: 15px; color: #ffd700;"></p>
-                    <div class="menu-group">
-                        <button id="btn-save-score">Save Score</button>
-                        <button id="btn-exit-home">Home</button>
-                    </div>
-                </div>
-
-                <div id="leaderboard-screen" class="screen hidden">
-                    <h1>Leaderboard</h1>
-                    <div id="leaderboard-area" style="width:100%; display:flex; flex-direction:column; align-items:center;">
-                        <table id="scores-table">
-                            <thead><tr><th>Rank</th><th>Name</th><th>Level</th><th>Score</th></tr></thead>
-                            <tbody id="leaderboard-body"></tbody>
-                        </table>
-                    </div>
-                    <div class="menu-group" style="margin-top:5px;">
-                        <button id="btn-lead-back">Back To Menu</button>
-                    </div>
-                </div>
+        <div id="hud" class="hidden">
+            <div class="health-bar-container">
+                <span class="char-info" id="player-info">Player</span>
+                <div id="player-fill" class="health-fill"></div>
             </div>
-
-            <div id="mobile-controller-layer">
-                <div class="control-pad">
-                    <div class="touch-btn" id="btn-left">←</div>
-                    <div class="touch-btn" id="btn-right">→</div>
-                    <div class="touch-btn" id="btn-duck">↓</div>
-                    <div class="touch-btn" id="btn-jump">↑</div>
-                </div>
-                <div class="control-pad">
-                    <div class="touch-btn" id="btn-block" style="font-size:0.75rem;">BLK</div>
-                    <div class="touch-btn" id="btn-punch">P</div>
-                    <div class="touch-btn" id="btn-big">U</div>
-                    <div class="touch-btn" id="btn-kick">K</div>
-                    <div class="touch-btn" id="btn-proj">🔥</div>
-                </div>
+            <div id="match-stats">
+                <div id="timer">60</div>
+                <div id="level-badge">ROUND 1</div>
             </div>
+            <div class="health-bar-container">
+                <span class="char-info" id="enemy-info">Enemy</span>
+                <div id="enemy-fill" class="health-fill"></div>
+            </div>
+        </div>
 
+        <div id="player" class="fighter hidden" style="--char-color: #3498db;">
+            <div class="sprite" id="player-sprite">
+                <div class="head">
+                    <div class="accessory acc-hat"></div>
+                    <div class="accessory acc-mask"></div>
+                    <div class="accessory acc-bow"></div>
+                    <div class="accessory acc-visor"></div>
+                    <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+                </div>
+                <div class="torso">
+                    <div class="accessory acc-belt"></div>
+                    <div class="accessory acc-clover">♣</div>
+                </div>
+                <div class="arm arm-left"></div>
+                <div class="arm arm-right"></div>
+                <div class="leg leg-left"></div>
+                <div class="leg leg-right"></div>
+            </div>
+        </div>
+
+        <div id="enemy" class="fighter hidden" style="--char-color: #f1c40f;">
+            <div class="sprite" id="enemy-sprite">
+                <div class="head">
+                    <div class="halo"></div>
+                    <div class="horns"><div class="horn"></div><div class="horn horn-r"></div></div>
+                    <div class="accessory acc-mask"></div>
+                    <div class="accessory acc-bow"></div>
+                    <div class="accessory acc-mouth"></div>
+                    <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+                </div>
+                <div class="torso">
+                    <div class="accessory acc-belt"></div>
+                    <div class="wings"><div class="wing-l"></div><div class="wing-r"></div></div>
+                </div>
+                <div class="arm arm-left"></div>
+                <div class="arm arm-right"></div>
+                <div class="leg leg-left"></div>
+                <div class="leg leg-right"></div>
+            </div>
+        </div>
+
+        <div id="home-screen" class="screen">
+            <h1>Dom beats them up.</h1>
+            <div class="menu-group">
+                <button onclick="showScreen('char-select-screen')">Start Game</button>
+                <button onclick="showScreen('leaderboard-screen')">Leaderboard</button>
+            </div>
+        </div>
+
+        <div id="char-select-screen" class="screen hidden">
+            <h1 style="font-size: 2rem;">Choose Your Fighter</h1>
+            <div class="char-grid">
+                <button class="char-btn" onclick="selectCharacter('speedways')"><span>📖</span>Speedways</button>
+                <button class="char-btn" onclick="selectCharacter('lee')"><span>🍣</span>Lee</button>
+                <button class="char-btn" onclick="selectCharacter('dom')"><span>🍕</span>Dom</button>
+                <button class="char-btn" onclick="selectCharacter('spaniard')"><span>🥖</span>Spaniard</button>
+                <button class="char-btn" onclick="selectCharacter('catterson')"><span>♣️</span>Catterson</button>
+                <button class="char-btn" onclick="selectCharacter('jeff')"><span>🛞</span>Jeff</button>
+            </div>
+            <button style="margin-top:20px; background:#2c3040;" onclick="showScreen('home-screen')">Back</button>
+        </div>
+
+        <div id="diff-screen" class="screen hidden">
+            <h1 style="font-size: 2rem;">Select Difficulty</h1>
+            <div class="menu-group">
+                <button onclick="startGame('easy')">Easy</button>
+                <button onclick="startGame('medium')">Medium</button>
+                <button onclick="startGame('hard')">Hard</button>
+            </div>
+        </div>
+
+        <div id="gameover-screen" class="screen hidden">
+            <h1 id="win-loss-title">MATCH OVER</h1>
+            <p id="score-reporting" style="margin-bottom: 15px; color: #ffd700; font-weight: bold; font-size: 1.2rem;"></p>
+            <div class="menu-group">
+                <button onclick="showLeaderboardInput()">Save Score</button>
+                <button onclick="returnToHome()">Home</button>
+            </div>
+        </div>
+
+        <div id="leaderboard-screen" class="screen hidden">
+            <h1>Leaderboard</h1>
+            <div id="leaderboard-area" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+                <table id="scores-table">
+                    <thead><tr><th>Rank</th><th>Name</th><th>Round</th><th>Score</th></tr></thead>
+                    <tbody id="leaderboard-body"></tbody>
+                </table>
+            </div>
+            <div class="menu-group" style="margin-top:10px;">
+                <button onclick="returnToHome()">Back To Menu</button>
+            </div>
         </div>
     </div>
 
     <script>
-        const config = { width: 800, baseSpeed: 5.5, gravity: 0.65 };
+        const config = { width: 800, baseSpeed: 5.5, gravity: 0.65, groundY: 20 };
 
         let state = {
             playerCharKey: 'dom', difficulty: 'medium', currentLevel: 1, score: 0, 
             gameActive: false, timeLeft: 60, timerInterval: null, musicInterval: null, musicStep: 0,
-            activeProjectiles: [], matchQueue: [],
-            bonusSpeed: 0, bonusDmg: 0, continueTimer: 5, continueInterval: null
+            activeProjectiles: []
         };
 
-        const masterCatalog = {
-            'speedways': { name: "Speedways", color: "#D4AC0D", theme: "theme-speedways", proj: "📖", health: 100, aiSpeed: 2.2 },
-            'lee': { name: "Lee", color: "#222222", theme: "theme-lee", proj: "🍣", health: 110, aiSpeed: 2.6 },
-            'dom': { name: "Dom Italia 90", color: "#008C45", theme: "theme-dom", proj: "🍕", health: 120, aiSpeed: 3.0 },
-            'spaniard': { name: "Spaniard", color: "#AA151B", theme: "theme-spaniard", proj: "🥖", health: 95, aiSpeed: 3.4 },
-            'catterson': { name: "Catterson", color: "#008000", theme: "theme-catterson", proj: "🔪", health: 105, aiSpeed: 2.8 },
-            'jeff': { name: "Jeff", color: "#1c1c1c", theme: "theme-jeff", proj: "🛞", health: 115, aiSpeed: 2.5 },
-            'angel': { name: "Angel", color: "#ffffff", theme: "theme-angel", proj: "⚡", health: 130, aiSpeed: 3.2 },
-            'ninja': { name: "Ninja", color: "#111111", theme: "theme-ninja-enemy", proj: "✺", health: 150, aiSpeed: 4.2 },
-            'devil': { name: "Devil", color: "#800080", theme: "theme-devil", proj: "🔥", health: 260, aiSpeed: 5.0 }
+        const charData = {
+            'speedways': { name: "Speedways", color: "#3498db", theme: "theme-speedways", proj: "📖" },
+            'lee': { name: "Lee", color: "#111", theme: "theme-lee", proj: "🍣" },
+            'dom': { name: "Dom", color: "#008C45", theme: "theme-dom", proj: "🍕" },
+            'spaniard': { name: "Spaniard", color: "#AA151B", theme: "theme-spaniard", proj: "🥖" },
+            'catterson': { name: "Catterson", color: "#008000", theme: "theme-catterson", proj: "🍀" },
+            'jeff': { name: "Jeff", color: "#111", theme: "theme-jeff", proj: "🛞" }
         };
 
-        let player = { x: 100, y: 0, vx: 0, vy: 0, health: 100, isAttacking: false, isDucking: false, isBlocking: false, isJumping: false, lastProj: 0, comboHits: 0, lastHitTime: 0 };
-        let enemy = { x: 600, y: 0, vy: 0, health: 100, isAttacking: false, isJumping: false, lastAttackTime: 0, lastProj: 0, currentKey: '' };
+        // Complete 5-Round Championship Setup Matrix
+        const levelData = {
+            1: { name: "Angel", color: "#f1c40f", theme: "theme-angel", proj: "⚡", health: 100, aiSpeed: 2.2 },
+            2: { name: "Ninja", color: "#111", theme: "theme-ninja-enemy", proj: "✺", health: 125, aiSpeed: 3.2 },
+            3: { name: "Devil", color: "#8e44ad", theme: "theme-devil", proj: "🔱", health: 150, aiSpeed: 4.2 },
+            4: { name: "Ghost", color: "#95a5a6", theme: "theme-speedways", proj: "💀", health: 175, aiSpeed: 4.8 },
+            5: { name: "Drogon", color: "#111", theme: "theme-drogon", proj: "🔥", health: 230, aiSpeed: 5.5 }
+        };
+
+        let player = { x: 100, y: 0, vx: 0, vy: 0, health: 100, isAttacking: false, isDucking: false, isBlocking: false, isJumping: false, lastProj: 0 };
+        let enemy = { x: 600, y: 0, vy: 0, health: 100, isAttacking: false, isJumping: false, lastAttackTime: 0, lastProj: 0 };
         let leaderboard = [];
 
         let audioCtx = null;
-        function initAudio() { 
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-        }
+        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
 
         function playTone(freq, type, dur, vol, slide = null) {
             if (!audioCtx) return;
@@ -383,27 +373,16 @@
         }
 
         function soundFx(type) {
-            if (type === 'punch') playTone(180, 'triangle', 0.12, 0.5, 60);
-            if (type === 'bigpunch') playTone(120, 'sawtooth', 0.25, 0.7, 30);
-            if (type === 'kick') playTone(150, 'triangle', 0.15, 0.55, 40);
-            if (type === 'jump') playTone(200, 'sine', 0.18, 0.3, 400);
-            if (type === 'block') playTone(90, 'square', 0.1, 0.4, 80);
-            if (type === 'hit') playTone(320, 'sawtooth', 0.1, 0.6, 100);
-            if (type === 'whoosh') playTone(250, 'sine', 0.3, 0.3, 50); // Near Miss
-        }
-
-        function playProjectileSound(characterKey, isPlayerLaunched) {
-            if (!isPlayerLaunched) {
-                if (characterKey === 'devil') { playTone(75, 'sawtooth', 0.5, 0.9, 30); return; }
-                playTone(600, 'square', 0.15, 0.4, 150); return;
-            }
-            switch(characterKey) {
-                case 'speedways': playTone(850, 'triangle', 0.15, 0.8, 250); break;
-                case 'lee': playTone(950, 'sine', 0.12, 0.75, 1400); break;
-                case 'dom': playTone(190, 'sawtooth', 0.35, 0.95, 75); break;
-                case 'spaniard': playTone(400, 'square', 0.22, 0.85, 200); break;
-                case 'catterson': playTone(1300, 'sine', 0.09, 0.75, 2400); break;
-                case 'jeff': playTone(380, 'sawtooth', 0.28, 0.85, 800); break;
+            if (type === 'punch') playTone(180, 'triangle', 0.12, 0.4, 60);
+            if (type === 'bigpunch') playTone(120, 'sawtooth', 0.25, 0.6, 30);
+            if (type === 'kick') playTone(150, 'triangle', 0.15, 0.45, 40);
+            if (type === 'jump') playTone(220, 'sine', 0.18, 0.25, 450);
+            if (type === 'block') playTone(90, 'square', 0.1, 0.3, 80);
+            if (type === 'hit') playTone(280, 'sawtooth', 0.1, 0.5, 90);
+            if (type === 'throw') playTone(550, 'sine', 0.2, 0.3, 150);
+            if (type === 'fire') { 
+                playTone(80, 'sawtooth', 0.4, 0.6, 250); 
+                playTone(130, 'triangle', 0.3, 0.5, 50); 
             }
         }
 
@@ -411,70 +390,24 @@
             if (!state.gameActive) return;
             state.musicStep = (state.musicStep + 1) % 8;
             let bassNotes = [55, 55, 65, 55, 73, 55, 65, 49];
-            if (enemy.currentKey === 'devil') bassNotes = [41, 41, 49, 41, 52, 41, 46, 37]; 
-            if (state.musicStep % 2 === 0) playTone(bassNotes[state.musicStep], 'triangle', 0.2, 0.3);
-            if (state.musicStep === 2 || state.musicStep === 6) playTone(200, 'square', 0.06, 0.15, 60);
+            if (state.musicStep % 2 === 0) playTone(bassNotes[state.musicStep], 'triangle', 0.2, 0.18);
+            if (state.musicStep === 2 || state.musicStep === 6) playTone(220, 'square', 0.06, 0.06, 80);
         }
-
-        // Screen Juice
-        function triggerShake() {
-            const gc = document.getElementById('game-container');
-            gc.style.transform = 'translate(6px, 4px)';
-            setTimeout(() => gc.style.transform = 'translate(-6px, -4px)', 25);
-            setTimeout(() => gc.style.transform = 'translate(0, 0)', 50);
-        }
-
-        function spawnFloatingText(text, x, y, styleClass) {
-            const el = document.createElement('div');
-            el.className = `floating-text ${styleClass}`;
-            el.innerText = text;
-            el.style.left = `${x}px`; el.style.top = `${y}px`;
-            document.getElementById('game-container').appendChild(el);
-            setTimeout(() => el.remove(), 800);
-        }
-
-        function scaleGameWindow() {
-            window.scrollTo(0, 0);
-            const wrapper = document.getElementById('canvas-scaler');
-            const w = window.innerWidth; const h = window.innerHeight;
-            let scale = Math.min(w / 840, h / 540); 
-            if (scale > 1.2) scale = 1.2; 
-            wrapper.style.transform = `scale(${scale})`;
-        }
-        
-        window.addEventListener('resize', scaleGameWindow);
-        window.addEventListener('orientationchange', () => { setTimeout(scaleGameWindow, 200); });
-        window.addEventListener('load', scaleGameWindow);
-        document.getElementById('fit-frame-cmd').onclick = () => { scaleGameWindow(); };
 
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
 
-        function generateMatchQueue(playerChoice) {
-            let options = ['speedways', 'lee', 'dom', 'spaniard', 'catterson', 'jeff'];
-            let roster = options.filter(c => c !== playerChoice);
-            roster.push('angel'); roster.push('ninja');
-            for (let i = roster.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [roster[i], roster[j]] = [roster[j], roster[i]];
-            }
-            roster.push('devil'); 
-            state.matchQueue = roster;
-        }
-
         function selectCharacter(charKey) {
             state.playerCharKey = charKey;
-            state.bonusSpeed = 0; state.bonusDmg = 0; // Reset progression
-            generateMatchQueue(charKey);
             showScreen('diff-screen');
         }
 
         const keys = { Left: false, Right: false, Duck: false, Block: false };
 
         window.addEventListener('keydown', e => {
-            if(!state.gameActive) return; initAudio();
+            if(!state.gameActive) return;
             if(e.code === 'KeyA' || e.code === 'ArrowLeft') keys.Left = true;
             if(e.code === 'KeyD' || e.code === 'ArrowRight') keys.Right = true;
             if(e.code === 'KeyS' || e.code === 'ArrowDown') keys.Duck = true;
@@ -496,39 +429,6 @@
             if(e.code === 'Space') keys.Block = false;
         });
 
-        function bindTouchControl(elementId, actionCallbackOrKeyState, isKeyMode = false, keyTargetStr = "") {
-            const el = document.getElementById(elementId);
-            el.addEventListener('touchstart', (e) => {
-                e.preventDefault(); initAudio();
-                if (isKeyMode) { keys[keyTargetStr] = true; } 
-                else { actionCallbackOrKeyState(); }
-            }, { passive: false });
-            el.addEventListener('touchend', (e) => {
-                e.preventDefault(); if (isKeyMode) keys[keyTargetStr] = false;
-            }, { passive: false });
-        }
-
-        bindTouchControl('btn-left', null, true, 'Left'); bindTouchControl('btn-right', null, true, 'Right');
-        bindTouchControl('btn-duck', null, true, 'Duck'); bindTouchControl('btn-block', null, true, 'Block');
-        bindTouchControl('btn-jump', () => { if (!player.isJumping && !player.isDucking && !player.isBlocking) { player.vy = -14; player.isJumping = true; soundFx('jump'); } });
-        bindTouchControl('btn-punch', () => performAttack('punch')); bindTouchControl('btn-big', () => performAttack('big-punch'));
-        bindTouchControl('btn-kick', () => performAttack('kick')); bindTouchControl('btn-proj', () => fireProjectile(true));
-
-        function attachDomUIEvents() {
-            document.getElementById('btn-core-start').onclick = () => { initAudio(); showScreen('char-select-screen'); };
-            document.getElementById('btn-core-lead').onclick = () => { initAudio(); showScreen('leaderboard-screen'); };
-            document.getElementById('btn-char-back').onclick = () => showScreen('home-screen');
-            document.getElementById('btn-exit-home').onclick = () => returnToHome();
-            document.getElementById('btn-lead-back').onclick = () => returnToHome();
-            document.getElementById('btn-save-score').onclick = () => showLeaderboardInput();
-            document.getElementById('btn-continue-yes').onclick = () => triggerContinue();
-            document.getElementById('btn-continue-no').onclick = () => { clearInterval(state.continueInterval); endGame(false, "GAME OVER"); };
-
-            document.querySelectorAll('.char-btn').forEach(btn => btn.onclick = () => selectCharacter(btn.getAttribute('data-char')));
-            document.querySelectorAll('.diff-btn').forEach(btn => btn.onclick = () => startGame(btn.getAttribute('data-diff')));
-        }
-        attachDomUIEvents();
-
         function startGame(difficulty) {
             initAudio();
             state.difficulty = difficulty; state.currentLevel = 1; state.score = 0; state.activeProjectiles = [];
@@ -538,48 +438,60 @@
             document.getElementById('hud').classList.remove('hidden');
             document.getElementById('player').classList.remove('hidden');
             document.getElementById('enemy').classList.remove('hidden');
-            
             state.gameActive = true;
+            
             setupLevel(state.currentLevel);
             
             clearInterval(state.timerInterval); clearInterval(state.musicInterval);
-            state.timeLeft = 90; document.getElementById('timer').innerText = state.timeLeft;
+            state.timeLeft = 60; document.getElementById('timer').innerText = state.timeLeft;
             
             state.timerInterval = setInterval(() => {
                 if(!state.gameActive) return;
                 state.timeLeft--; document.getElementById('timer').innerText = state.timeLeft;
-                if(state.timeLeft <= 0) handleLoss();
+                if(state.timeLeft <= 0) endGame(false, "TIME OUT!");
             }, 1000);
-            
-            state.musicInterval = setInterval(playBeatStep, 210);
-            scaleGameWindow();
+            state.musicInterval = setInterval(playBeatStep, 220);
+
             window.requestAnimationFrame(updateFrameLoop);
         }
 
         function setupLevel(lvl) {
-            const opponentKey = state.matchQueue[lvl - 1];
-            enemy.currentKey = opponentKey;
-            const eData = masterCatalog[opponentKey];
-            const pData = masterCatalog[state.playerCharKey];
+            state.currentLevel = lvl;
+            let eData = { ...levelData[lvl] };
             
+            // Random assignment matrix for levels 1 through 4
+            if (lvl < 5) {
+                const opponentsPool = [
+                    { name: "Angel", color: "#f1c40f", theme: "theme-angel", proj: "⚡" },
+                    { name: "Blue Ninja", color: "#111", theme: "theme-ninja-enemy", proj: "✺" },
+                    { name: "Devil", color: "#8e44ad", theme: "theme-devil", proj: "🔱" },
+                    { name: "Catterson", color: "#008000", theme: "theme-catterson", proj: "🍀" },
+                    { name: "Speedways", color: "#3498db", theme: "theme-speedways", proj: "📖" }
+                ];
+                const selection = opponentsPool[Math.floor(Math.random() * opponentsPool.length)];
+                eData.name = selection.name;
+                eData.color = selection.color;
+                eData.theme = selection.theme;
+                eData.proj = selection.proj;
+            }
+
+            // CRITICAL RESET FLUSH: Prevents Level 2 state freeze locks
             player.health = 100; player.x = 100; player.y = 0; player.vx = 0; player.vy = 0;
             player.isAttacking = false; player.isDucking = false; player.isBlocking = false; player.isJumping = false;
             
-            let difficultyHealthModifier = 1.0;
-            if (state.difficulty === 'easy') difficultyHealthModifier = 0.7;
-            if (state.difficulty === 'hard') difficultyHealthModifier = 1.4;
-            
-            enemy.health = Math.round(eData.health * difficultyHealthModifier);
-            enemy.maxHealth = enemy.health; 
-            enemy.x = 580; enemy.y = 0; enemy.vy = 0;
+            enemy.health = eData.health; enemy.x = 600; enemy.y = 0; enemy.vy = 0;
             enemy.isAttacking = false; enemy.isJumping = false;
             
-            state.activeProjectiles = []; document.getElementById('projectile-layer').innerHTML = '';
-
-            document.getElementById('level-badge').innerText = `LEVEL ${lvl} / 8`;
-            document.getElementById('player-info').innerText = pData.name;
-            document.getElementById('enemy-info').innerText = `${eData.name}`;
+            keys.Left = false; keys.Right = false; keys.Duck = false; keys.Block = false;
             
+            state.activeProjectiles = [];
+            document.getElementById('projectile-layer').innerHTML = '';
+
+            document.getElementById('level-badge').innerText = `ROUND ${lvl} / 5`;
+            document.getElementById('player-info').innerText = charData[state.playerCharKey].name;
+            document.getElementById('enemy-info').innerText = `${eData.name} [Rnd ${lvl}]`;
+            
+            const pData = charData[state.playerCharKey];
             const pEl = document.getElementById('player');
             pEl.style.setProperty('--char-color', pData.color);
             pEl.className = `fighter ${pData.theme}`;
@@ -587,6 +499,10 @@
             const eEl = document.getElementById('enemy');
             eEl.style.setProperty('--char-color', eData.color);
             eEl.className = `fighter ${eData.theme}`;
+            
+            // Wipe animation frames instantly
+            pEl.classList.remove('anim-punch', 'anim-big-punch', 'anim-kick', 'anim-throw', 'anim-duck', 'anim-block', 'hit-flash', 'jump-spin');
+            eEl.classList.remove('anim-punch', 'anim-big-punch', 'anim-kick', 'anim-throw', 'anim-duck', 'anim-block', 'hit-flash', 'jump-spin');
             
             updateVisuals();
         }
@@ -600,25 +516,22 @@
             
             pEl.classList.toggle('anim-duck', player.isDucking); 
             pEl.classList.toggle('anim-block', player.isBlocking);
+            pEl.classList.toggle('jump-spin', player.isJumping);
+            eEl.classList.toggle('jump-spin', enemy.isJumping);
 
-            // Acrobatic Ninja Jump Processing
-            if (player.isJumping && (state.playerCharKey === 'lee' || state.playerCharKey === 'ninja')) pEl.classList.add('anim-spin'); else pEl.classList.remove('anim-spin');
-            if (enemy.isJumping && (enemy.currentKey === 'lee' || enemy.currentKey === 'ninja')) eEl.classList.add('anim-spin'); else eEl.classList.remove('anim-spin');
+            // Physics Vector Engines
+            if(player.isJumping) { player.vy += config.gravity; player.y += player.vy; if(player.y >= 0) { player.y = 0; player.isJumping = false; } }
+            if(enemy.isJumping) { enemy.vy += config.gravity; enemy.y += enemy.vy; if(enemy.y >= 0) { enemy.y = 0; enemy.isJumping = false; } }
 
-            if(player.isJumping) { player.vy += config.gravity; player.y += player.vy; if(player.y >= 0) { player.y = 0; player.isJumping = false; player.vy = 0; } }
-            if(enemy.isJumping) { enemy.vy += config.gravity; enemy.y += enemy.vy; if(enemy.y >= 0) { enemy.y = 0; enemy.isJumping = false; enemy.vy = 0; } }
-
+            // Left/Right tracking checks
             player.vx = 0;
             if(!player.isDucking && !player.isBlocking && !player.isAttacking) {
-                if(keys.Left) player.vx = -(config.baseSpeed + state.bonusSpeed);
-                if(keys.Right) player.vx = config.baseSpeed + state.bonusSpeed;
+                if(keys.Left) player.vx = -config.baseSpeed;
+                if(keys.Right) player.vx = config.baseSpeed;
             }
             player.x += player.vx;
-            
             if(player.x < 0) player.x = 0;
-            let widthClampingBound = 55;
-            if (enemy.currentKey === 'devil') widthClampingBound = 90; 
-            if(player.x > enemy.x - widthClampingBound) player.x = enemy.x - widthClampingBound;
+            if(player.x > enemy.x - 40) player.x = enemy.x - 40;
 
             processEnemyAI();
             processProjectiles();
@@ -630,35 +543,38 @@
         }
 
         function processEnemyAI() {
-            const ai = masterCatalog[enemy.currentKey];
-            let spd = ai.aiSpeed; let atkInt = 1300; let projChance = 0.02;
-            if (state.difficulty === 'easy') { spd *= 0.5; atkInt = 2400; projChance = 0.006; } 
+            const currentRoundData = levelData[state.currentLevel];
+            let spd = currentRoundData.aiSpeed; 
+            let atkInt = 1300; 
+            let projChance = 0.015;
+            
+            if (state.difficulty === 'easy') { spd *= 0.45; atkInt = 2400; projChance = 0.004; } 
             else if (state.difficulty === 'hard') { spd *= 1.3; atkInt = 700; projChance = 0.04; }
 
             const dist = enemy.x - player.x;
-            
-            let targetApproachBufferMin = 60; let targetApproachBufferMax = 80; let combatTriggerRange = 105;
-            if (enemy.currentKey === 'devil') { targetApproachBufferMin = 85; targetApproachBufferMax = 115; combatTriggerRange = 145; }
 
             if (!enemy.isAttacking) {
-                if(dist > targetApproachBufferMax) enemy.x -= spd;
-                else if (dist < targetApproachBufferMin) enemy.x += spd;
-                
-                if ((enemy.currentKey === 'ninja' || enemy.currentKey === 'lee') && !enemy.isJumping && Math.random() < 0.035) {
-                    enemy.vy = -16; enemy.isJumping = true; soundFx('jump');
-                }
+                if(dist > 85) enemy.x -= spd;
+                else if (dist < 60) enemy.x += spd;
             }
-            
-            let boundaryRight = config.width - 90;
-            if (enemy.currentKey === 'devil') boundaryRight = config.width - 120;
-            if(enemy.x > boundaryRight) { enemy.x = boundaryRight; }
+            if(enemy.x > config.width - 95) enemy.x = config.width - 95;
 
             const now = Date.now();
-            if(dist <= combatTriggerRange && (now - enemy.lastAttackTime > atkInt)) {
+            
+            // Melee triggers
+            if(dist <= 100 && (now - enemy.lastAttackTime > atkInt)) {
                 performEnemyAttack(dist);
             }
-            else if (dist > 220 && now - enemy.lastProj > 1600 && Math.random() < projChance) {
+            // Projectiles triggers
+            else if (dist > 190 && now - enemy.lastProj > 1800 && Math.random() < projChance) {
                 fireProjectile(false);
+            }
+
+            // Calmed Symmetrical Jump Randomizer: Prevents excessive bounce rates
+            if (!enemy.isJumping && !enemy.isAttacking && Math.random() < 0.006) {
+                enemy.vy = -12;
+                enemy.isJumping = true;
+                soundFx('jump');
             }
         }
 
@@ -666,27 +582,45 @@
             const now = Date.now();
             const source = isPlayer ? player : enemy;
             if(source.isAttacking || source.isBlocking || source.isDucking) return;
-            if(isPlayer && now - player.lastProj < 700) return; 
+            if(isPlayer && now - player.lastProj < 800) return;
             
             source.isAttacking = true; source.lastProj = now;
-            playProjectileSound(isPlayer ? state.playerCharKey : enemy.currentKey, isPlayer);
+            
+            // Trigger customized Dragon audio logic
+            if(!isPlayer && state.currentLevel === 5) {
+                soundFx('fire');
+            } else {
+                soundFx('throw');
+            }
             
             const el = document.getElementById(isPlayer ? 'player' : 'enemy');
             el.classList.add('anim-throw');
 
-            const symbol = isPlayer ? masterCatalog[state.playerCharKey].proj : masterCatalog[enemy.currentKey].proj;
-            let px = isPlayer ? source.x + 55 : source.x - 15;
-            let py = 300 + source.y; 
-            if(!isPlayer && enemy.currentKey === 'devil') { px = source.x - 40; py = 250 + source.y; }
+            // Collect active layout mappings
+            let symbol = isPlayer ? charData[state.playerCharKey].proj : levelData[state.currentLevel].proj;
+            
+            // If the assignment engine rolled an enemy character style for rounds 1-4, pull its assigned graphic
+            if(!isPlayer && state.currentLevel < 5) {
+                const badge = document.getElementById('enemy-info').innerText;
+                if(badge.includes("Angel")) symbol = "⚡";
+                else if(badge.includes("Ninja")) symbol = "✺";
+                else if(badge.includes("Devil")) symbol = "🔱";
+                else if(badge.includes("Catterson")) symbol = "🍀";
+                else if(badge.includes("Speedways")) symbol = "📖";
+            }
+
+            // Absolute calculations matching hands cleanly
+            const px = isPlayer ? source.x + 65 : source.x - 15;
+            const py = 255 + source.y; 
 
             const pDiv = document.createElement('div');
             pDiv.className = 'projectile'; pDiv.innerText = symbol;
-            if (!isPlayer && enemy.currentKey === 'devil') pDiv.style.fontSize = '50px'; 
             document.getElementById('projectile-layer').appendChild(pDiv);
 
             state.activeProjectiles.push({
-                isPlayer: isPlayer, x: px, y: py, vx: isPlayer ? 12 : -12,
-                el: pDiv, active: true, nearMissPlayed: false
+                isPlayer: isPlayer, x: px, y: py,
+                vx: isPlayer ? 11 : -11,
+                el: pDiv, active: true
             });
 
             setTimeout(() => { el.classList.remove('anim-throw'); source.isAttacking = false; }, 250);
@@ -701,21 +635,9 @@
                 const target = p.isPlayer ? enemy : player;
                 const tx = target.x;
                 
-                // Flow State: Near Miss Mechanic
-                if (!p.isPlayer && !p.nearMissPlayed) {
-                    const distToPlayer = p.x - player.x;
-                    if (distToPlayer > -10 && distToPlayer < 70 && player.isDucking) {
-                        soundFx('whoosh'); p.nearMissPlayed = true;
-                        spawnFloatingText("WHOOSH!", player.x, 280, 'whoosh-text');
-                    }
-                }
-
-                let targetSpanWidth = 60;
-                if(p.isPlayer && enemy.currentKey === 'devil') targetSpanWidth = 110; 
-
                 let hit = false;
-                if(p.isPlayer && p.x > tx && p.x < tx + targetSpanWidth) hit = true;
-                if(!p.isPlayer && p.x < tx + 60 && p.x > tx) hit = true;
+                if(p.isPlayer && p.x > tx + 20 && p.x < tx + 75) hit = true;
+                if(!p.isPlayer && p.x < tx + 60 && p.x > tx + 5) hit = true;
 
                 if(hit) {
                     p.active = false; p.el.remove();
@@ -724,20 +646,16 @@
                     if(!p.isPlayer && player.isBlocking) { soundFx('block'); target.health -= 2; }
                     else {
                         soundFx('hit'); 
-                        let baseDamageValue = 14;
-                        if(p.isPlayer) {
-                            baseDamageValue += state.bonusDmg; // Player Progression stat inclusion
-                            triggerShake();
-                        }
-                        if (!p.isPlayer && enemy.currentKey === 'devil') { baseDamageValue = 24; triggerShake(); } 
-                        target.health -= baseDamageValue;
+                        let baseDamage = 14;
+                        if(!p.isPlayer && state.currentLevel === 5) baseDamage = 22; // Drogon flame multi
+                        target.health -= baseDamage;
                         
                         const tel = document.getElementById(p.isPlayer ? 'enemy' : 'player');
                         tel.classList.add('hit-flash'); setTimeout(() => tel.classList.remove('hit-flash'), 120);
-                        if(p.isPlayer) state.score += 15 * (state.difficulty === 'hard' ? 3 : 1);
+                        if(p.isPlayer) state.score += baseDamage * (state.difficulty === 'hard' ? 3 : 1);
                     }
                     checkMatch();
-                } else if (p.x < -80 || p.x > config.width + 80) {
+                } else if (p.x < -60 || p.x > config.width + 60) {
                     p.active = false; p.el.remove();
                 }
             });
@@ -747,12 +665,6 @@
         function performAttack(type) {
             if(!state.gameActive || player.isAttacking || player.isDucking || player.isBlocking) return;
             player.isAttacking = true;
-            
-            // Flow State: Variable Combo Timing Multiplier
-            const now = Date.now();
-            if (now - player.lastHitTime < 600) { player.comboHits++; } else { player.comboHits = 0; }
-            player.lastHitTime = now;
-
             const pEl = document.getElementById('player'); pEl.classList.add(`anim-${type}`);
             
             if(type === 'punch') soundFx('punch');
@@ -761,124 +673,73 @@
 
             const dist = enemy.x - player.x;
             let rng = type === 'big-punch' ? 120 : 100;
-            if(enemy.currentKey === 'devil') rng += 40; 
 
             if(dist > 0 && dist <= rng) {
-                let baseDmg = type === 'big-punch' ? 22 : (type === 'kick' ? 14 : 10);
-                baseDmg += state.bonusDmg; // Add progression stats
-                
-                let comboMultiplier = 1 + (0.1 * player.comboHits); // 10% boost per consecutive hit
-                let finalDmg = Math.round(baseDmg * comboMultiplier);
-                
-                enemy.health -= finalDmg;
-                state.score += finalDmg * (state.difficulty === 'hard' ? 3 : state.difficulty === 'medium' ? 2 : 1);
+                let dmg = type === 'big-punch' ? 22 : (type === 'kick' ? 14 : 10);
+                enemy.health -= dmg;
+                state.score += dmg * (state.difficulty === 'hard' ? 3 : state.difficulty === 'medium' ? 2 : 1);
                 soundFx('hit');
-                
-                if (type === 'big-punch') triggerShake();
-                if (player.comboHits > 1) spawnFloatingText(`${player.comboHits}x COMBO!`, enemy.x, 260, 'combo-text');
-                
                 const eEl = document.getElementById('enemy'); eEl.classList.add('hit-flash');
                 setTimeout(() => eEl.classList.remove('hit-flash'), 120);
             }
 
-            setTimeout(() => { pEl.classList.remove(`anim-${type}`); player.isAttacking = false; checkMatch(); }, type === 'big-punch' ? 350 : 220);
+            setTimeout(() => { pEl.classList.remove(`anim-${type}`); player.isAttacking = false; checkMatch(); }, type === 'big-punch' ? 340 : 200);
         }
 
         function performEnemyAttack(dist) {
             enemy.lastAttackTime = Date.now(); enemy.isAttacking = true;
             const eEl = document.getElementById('enemy');
             
-            let atkType = Math.random() > 0.6 ? 'anim-kick' : 'anim-punch';
-            if(enemy.currentKey === 'devil' && Math.random() > 0.5) atkType = 'anim-big-punch';
+            let atkType = Math.random() > 0.65 ? 'anim-kick' : 'anim-punch';
+            if((state.currentLevel === 3 || state.currentLevel === 5) && Math.random() > 0.5) atkType = 'anim-big-punch';
             
             eEl.classList.add(atkType);
             soundFx(atkType.includes('big') ? 'bigpunch' : (atkType.includes('kick') ? 'kick' : 'punch'));
 
-            let enemyStrikingRange = 100;
-            if (enemy.currentKey === 'devil') enemyStrikingRange = 145;
-
-            if(dist > 0 && dist <= enemyStrikingRange) {
+            if(dist > 0 && dist <= 105) {
                 if (player.isDucking && atkType !== 'anim-kick') {} 
                 else {
-                    let bdmg = 12;
-                    if(atkType === 'anim-big-punch') bdmg = 22;
-                    if(enemy.currentKey === 'devil') bdmg *= 1.6; 
-                    
-                    if(state.difficulty === 'easy') bdmg *= 0.5; 
-                    if(state.difficulty === 'hard') bdmg *= 1.4;
+                    let bdmg = state.currentLevel >= 4 ? 18 : 12;
+                    if(atkType === 'anim-big-punch') bdmg = 25;
+                    if(state.difficulty === 'easy') bdmg *= 0.4; if(state.difficulty === 'hard') bdmg *= 1.45;
                     
                     if (player.isBlocking) { bdmg *= 0.15; soundFx('block'); } 
                     else {
                         soundFx('hit'); const pEl = document.getElementById('player');
-                        if (enemy.currentKey === 'devil') triggerShake(); // Heavy hits from boss
                         pEl.classList.add('hit-flash'); setTimeout(() => pEl.classList.remove('hit-flash'), 120);
                     }
                     player.health -= Math.round(bdmg);
                 }
             }
-            setTimeout(() => { eEl.classList.remove(atkType); enemy.isAttacking = false; checkMatch(); }, 250);
+            setTimeout(() => { eEl.classList.remove(atkType); enemy.isAttacking = false; checkMatch(); }, 240);
         }
 
         function updateVisuals() {
             document.getElementById('player-fill').style.width = `${Math.max(0, player.health)}%`;
-            const maxHp = enemy.maxHealth || 100;
-            document.getElementById('enemy-fill').style.width = `${Math.max(0, (enemy.health / maxHp) * 100)}%`;
+            const mHp = levelData[state.currentLevel].health;
+            // Handle display scaling relative to dynamic level matrix configs
+            const matchName = document.getElementById('enemy-info').innerText;
+            let currentLevelMaxHp = mHp;
+            if (state.currentLevel < 5) {
+                // Keep scaled health parameters sync'd properly with the pool
+                currentLevelMaxHp = levelData[state.currentLevel].health;
+            }
+            document.getElementById('enemy-fill').style.width = `${Math.max(0, (enemy.health / currentLevelMaxHp) * 100)}%`;
         }
 
         function checkMatch() {
             updateVisuals();
-            if(player.health <= 0) { 
-                playTone(150, 'sawtooth', 0.8, 0.5, 40); 
-                handleLoss();
-            }
+            if(player.health <= 0) { playTone(140, 'sawtooth', 0.8, 0.5, 30); endGame(false, "YOU LOSE"); }
             else if(enemy.health <= 0) {
-                state.gameActive = false; // Pause engine
-                if(state.currentLevel < 8) {
-                    playTone(400, 'sine', 0.4, 0.3, 600);
-                    handleProgressionWin();
+                if(state.currentLevel < 5) {
+                    playTone(420, 'sine', 0.35, 0.3, 620);
+                    state.currentLevel++; 
+                    setupLevel(state.currentLevel);
                 } else {
-                    playTone(300, 'sine', 0.2, 0.4, 500); setTimeout(() => playTone(500, 'sine', 0.5, 0.4, 900), 150);
+                    playTone(320, 'sine', 0.2, 0.4, 520); setTimeout(() => playTone(520, 'sine', 0.5, 0.4, 950), 140);
                     endGame(true, "CHAMPION VICTORY!");
                 }
             }
-        }
-
-        function handleProgressionWin() {
-            state.bonusSpeed += 0.5;
-            state.bonusDmg += 2;
-            document.getElementById('progression-stats').innerHTML = `+0.5 SPEED<br>+2 DAMAGE`;
-            showScreen('progression-screen');
-            setTimeout(() => {
-                state.gameActive = true;
-                state.currentLevel++; setupLevel(state.currentLevel);
-                document.getElementById('hud').classList.remove('hidden');
-                document.getElementById('progression-screen').classList.add('hidden');
-            }, 2000);
-        }
-
-        function handleLoss() {
-            state.gameActive = false;
-            state.continueTimer = 5;
-            document.getElementById('continue-count').innerText = state.continueTimer;
-            showScreen('continue-screen');
-            state.continueInterval = setInterval(() => {
-                state.continueTimer--;
-                document.getElementById('continue-count').innerText = state.continueTimer;
-                if (state.continueTimer <= 0) {
-                    clearInterval(state.continueInterval);
-                    endGame(false, "GAME OVER");
-                }
-            }, 1000);
-        }
-
-        function triggerContinue() {
-            clearInterval(state.continueInterval);
-            player.health = 100; enemy.health = enemy.maxHealth;
-            player.x = 100; enemy.x = 580;
-            state.timeLeft = 90; document.getElementById('timer').innerText = state.timeLeft;
-            updateVisuals();
-            showScreen('hud');
-            state.gameActive = true;
         }
 
         function endGame(isWin, msg) {
@@ -894,26 +755,19 @@
         function showLeaderboardInput() {
             let initials = prompt("Enter your name:", "PLAYER");
             if (!initials) initials = "UNKNOWN";
-            leaderboard.push({ name: initials.substring(0,10).toUpperCase(), level: state.currentLevel, score: state.score, diff: state.difficulty.toUpperCase() });
+            leaderboard.push({ name: initials.substring(0,10).toUpperCase(), level: state.currentLevel, score: state.score });
             leaderboard.sort((a,b) => b.score - a.score);
             
             const tbody = document.getElementById('leaderboard-body'); tbody.innerHTML = "";
             leaderboard.forEach((r,i) => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>#${i+1}</td><td>${r.name}</td><td>Lv ${r.level}</td><td style="color:#ffd700;">${r.score}</td>`;
+                tr.innerHTML = `<td>#${i+1}</td><td>${r.name}</td><td>Round ${r.level}</td><td style="color:#ffd700; font-weight:bold;">${r.score}</td>`;
                 tbody.appendChild(tr);
             });
             showScreen('leaderboard-screen');
         }
 
-        function returnToHome() { 
-            state.gameActive = false;
-            clearInterval(state.timerInterval); clearInterval(state.musicInterval); clearInterval(state.continueInterval);
-            document.getElementById('hud').classList.add('hidden');
-            document.getElementById('player').classList.add('hidden');
-            document.getElementById('enemy').classList.add('hidden');
-            showScreen('home-screen'); 
-        }
+        function returnToHome() { showScreen('home-screen'); }
     </script>
 </body>
 </html>
