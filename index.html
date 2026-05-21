@@ -1,103 +1,71 @@
-Here is the fully expanded, highly optimized, and feature-rich version of **"Dom beats them up."** This complete single-file implementation addresses all your requests: extended match timeouts, enhanced synthesized audio engines, corrected character aesthetics (horns restricted exclusively to the Devil and the Dragon), independent fluid movement modules for unique scale mechanics (including a dedicated flight/hover glide module for the large-scale Dragon boss), refined limb-contained flash animations, precise proximity-tuned combat mechanics, and a fully responsive mobile frame with a landscape control pad tailored for iOS Safari on iPhone.
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Dom beats them up. - Ultimate Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dom beats them up.</title>
     <style>
         * {
-            box-sizing: border-box; 
-            user-select: none; 
-            -webkit-user-select: none; 
-            margin: 0; 
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0;
         }
         body {
-            background-color: #050508; 
-            font-family: 'Courier New', Courier, monospace; 
-            color: #fff;
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            min-height: 100vh;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            background-color: #0b0b12; font-family: 'Courier New', Courier, monospace; color: #fff;
+            overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;
         }
 
-        /* Responsive Frame Wrapper */
-        #game-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transform-origin: center center;
+        #super-container {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: transform 0.2s ease;
-            width: 100%;
-            max-width: 800px;
         }
 
         #game-container {
-            position: relative; 
-            width: 800px; 
-            height: 400px;
-            background: linear-gradient(to bottom, #0d101d 0%, #15182c 40%, #1e233d 75%, #05060a 100%);
-            border: 4px solid #333; 
-            overflow: hidden; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
-            border-radius: 6px;
+            position: relative; width: 800px; height: 400px;
+            background: linear-gradient(to bottom, #111424 0%, #1d213a 60%, #08090f 100%);
+            border: 4px solid #444; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.8);
         }
         
         /* Screens configuration */
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(6, 6, 12, 0.97); z-index: 20;
-            padding: 20px;
+            background: rgba(8, 8, 14, 0.96); z-index: 20;
         }
         .hidden { display: none !important; }
         
         h1 {
-            font-size: 3rem; color: #ff2a35; text-shadow: 0 0 15px rgba(255,42,53,0.8);
-            margin-bottom: 25px; text-transform: uppercase; letter-spacing: 4px; font-weight: 900; text-align: center;
+            font-size: 3.2rem; color: #ff2a35; text-shadow: 0 0 15px rgba(255,42,53,0.7);
+            margin-bottom: 20px; text-transform: uppercase; letter-spacing: 3px; font-weight: 900; text-align: center;
         }
-        h2 { font-size: 1.5rem; color: #ffd700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px;}
-        .menu-group { display: flex; flex-direction: column; gap: 15px; width: 320px; }
-        .char-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 650px; width: 100%; }
+        h2 { font-size: 1.6rem; color: #ffd700; margin-bottom: 20px; }
+        .menu-group { display: flex; flex-direction: column; gap: 15px; width: 300px; }
+        .char-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; max-width: 600px; }
         
         button {
-            padding: 14px 20px; font-size: 1.1rem; font-family: inherit; background: #13131f;
-            color: #fff; border: 2px solid #444; cursor: pointer; transition: all 0.15s ease; text-transform: uppercase;
-            font-weight: bold; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            padding: 14px 20px; font-size: 1.2rem; font-family: inherit; background: #1a1a26;
+            color: #fff; border: 2px solid #555; cursor: pointer; transition: all 0.2s; text-transform: uppercase;
+            font-weight: bold; border-radius: 4px;
         }
-        button:hover { background: #ff2a35; border-color: #fff; box-shadow: 0 0 15px rgba(255,42,53,0.7); transform: translateY(-2px); }
-        button:active { transform: translateY(1px); }
-        
-        .char-btn { font-size: 0.95rem; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 8px;}
-        .char-btn span { font-size: 28px; }
+        button:hover { background: #ff2a35; border-color: #fff; box-shadow: 0 0 15px rgba(255,42,53,0.6); }
+        .char-btn { font-size: 1rem; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 5px;}
+        .char-btn span { font-size: 24px; }
         
         /* HUD UI */
         #hud {
-            position: absolute; top: 0; left: 0; width: 100%; padding: 15px 20px;
+            position: absolute; top: 0; left: 0; width: 100%; padding: 15px;
             display: flex; justify-content: space-between; align-items: center; z-index: 5;
         }
-        .health-bar-container { width: 38%; height: 26px; background: #1a1a1a; border: 2px solid #fff; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-radius: 3px; }
-        .health-fill { height: 100%; width: 100%; background: linear-gradient(to bottom, #2ecc71, #27ae60); transition: width 0.1s ease-out; }
-        #enemy-fill { background: linear-gradient(to bottom, #e74c3c, #c0392b); float: right; }
-        .char-info { position: absolute; top: -22px; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; color: #eee; letter-spacing: 1px; text-shadow: 0 2px 4px #000; }
-        #enemy-info { right: 0; text-align: right; }
-        #match-stats { text-align: center; font-size: 1.7rem; font-weight: bold; text-shadow: 0 3px 6px #000; min-width: 80px; }
-        #level-badge { color: #ffd700; font-size: 0.85rem; display: block; margin-top: 3px; letter-spacing: 1px; }
+        .health-bar-container { width: 36%; height: 24px; background: #222; border: 2px solid #fff; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .health-fill { height: 100%; width: 100%; background: #2ecc71; transition: width 0.05s ease-out; }
+        #enemy-fill { background: #e74c3c; float: right; }
+        .char-info { position: absolute; top: -20px; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; color: #ddd; letter-spacing: 1px; }
+        #enemy-info { right: 0; }
+        #match-stats { text-align: center; font-size: 1.5rem; font-weight: bold; text-shadow: 0 2px 4px #000; }
+        #level-badge { color: #ffd700; font-size: 0.9rem; display: block; margin-top: 2px; }
 
         /* Fighter Base Dynamics */
         .fighter {
-            position: absolute; bottom: 25px; width: 90px; height: 130px;
-            transform-origin: bottom center;
-            will-change: transform;
+            position: absolute; bottom: 20px; width: 90px; height: 130px;
+            transition: transform 0.02s linear; transform-origin: bottom center;
         }
         .sprite { position: relative; width: 100%; height: 100%; }
         #enemy .sprite { transform: scaleX(-1); }
@@ -111,206 +79,190 @@ Here is the fully expanded, highly optimized, and feature-rich version of **"Dom
         .eye { width: 4px; height: 4px; background: var(--eye-color, #fff); border-radius: 50%; }
         
         .torso {
-            position: absolute; top: 42px; left: 42px; width: 6px; height: 42px;
+            position: absolute; top: 42px; left: 43px; width: var(--torso-width, 6px); height: 42px;
             background: var(--torso-color, var(--char-color)); z-index: 2; border-radius: 3px;
+            display: flex; align-items: center; justify-content: center;
         }
         
         .arm {
-            position: absolute; top: 46px; left: 44px; width: 38px; height: 6px;
+            position: absolute; top: 46px; left: 44px; width: var(--arm-width, 38px); height: 5px;
             background: var(--char-color); transform-origin: left center; z-index: 4;
-            transition: transform 0.05s, width 0.05s; border-radius: 3px;
+            transition: transform 0.08s, width 0.08s; border-radius: 3px;
         }
         .arm-left { transform: rotate(140deg); }
         .arm-right { transform: rotate(40deg); }
         
         .leg {
-            position: absolute; top: 82px; left: 44px; width: 44px; height: 6px;
+            position: absolute; top: 82px; left: 44px; width: 44px; height: 5px;
             background: var(--char-color); transform-origin: left center; z-index: 1;
-            transition: transform 0.05s; border-radius: 3px;
+            transition: transform 0.08s; border-radius: 3px;
         }
         .leg-left { transform: rotate(105deg); }
         .leg-right { transform: rotate(75deg); }
 
-        /* --- ACCESSORIES & HORNS RESTRICTION --- */
-        .accessory { display: none; position: absolute; }
-        .horns { display: none; position: absolute; top: -8px; left: 1px; width: 28px; height: 10px; justify-content: space-between; z-index: 5; }
+        /* --- VISUAL ELEMENTS COMPONENT SYSTEM --- */
+        .horns, .wings, .halo, .accessory { display: none; position: absolute; }
+
+        /* Horns Restriction Rule */
+        .theme-devil .horns, .theme-dragon .horns { display: flex; top: -10px; left: 1px; width: 28px; height: 10px; justify-content: space-between; z-index: 5; }
         .horn { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 12px solid #ff2a35; transform: rotate(-15deg); }
         .horn-r { transform: rotate(15deg); }
 
-        /* Speedways */
-        .theme-speedways .acc-hat { display: block; top: -6px; left: -5px; width: 36px; height: 6px; background: #fff; border-radius: 1px; z-index: 5;}
-        
-        /* Lee */
-        .theme-lee .acc-mask { display: block; top: 5px; left: -2px; width: 34px; height: 10px; background: #e51b24; z-index: 4; opacity: 0.95;}
-        .theme-lee .torso { background: #222; border-left: 2px solid #e51b24; }
-
-        /* Dom (Muscular Italian Engine Scales Up Visuals Only - Fluid Logic Controls Box) */
-        .theme-dom { transform: scale(1.22); }
-        .theme-dom .torso { width: 14px; left: 38px; background: linear-gradient(to right, #008C45 33%, #F4F5F0 33%, #F4F5F0 66%, #CD212A 66%); }
-        .theme-dom .arm { height: 8px; width: 42px; }
-
-        /* Spaniard (Short Spanish Scale Visuals Only - Dynamic Core Logic Unlocks Movement) */
-        .theme-spaniard { transform: scale(0.72); }
-        .theme-spaniard .torso { width: 10px; left: 40px; background: linear-gradient(to bottom, #AA151B 30%, #F1BF00 30%, #F1BF00 70%, #AA151B 70%); }
-
-        /* Catterson */
-        .theme-catterson .acc-clover { display: block; top: 8px; left: -10px; color: #2ecc71; font-size: 22px; text-shadow: 0 0 3px #000; font-weight: bold; }
-
-        /* Jeff */
-        .theme-jeff .head { background: #ffd700; border-color: #222; }
-        .theme-jeff .acc-visor { display: block; top: 6px; left: 12px; width: 18px; height: 10px; background: #111; border-radius: 3px; }
-
-        /* ENEMY DESIGN EXTENSIONS */
-        /* Angel Wings */
-        .theme-angel .wings { display: block; }
-        .theme-angel .wing-l, .theme-angel .wing-r { background: #ffffff; box-shadow: 0 0 12px rgba(255,255,255,0.6); border-radius: 100% 10% 80% 10%; }
-        
-        /* Devil Horns + Wings */
-        .theme-devil .horns { display: flex; }
-        .theme-devil .wings { display: block; }
-        .theme-devil .wing-l, .theme-devil .wing-r { background: #4a0505; border: 1px solid #ff2a35; border-radius: 10% 100% 10% 80%; }
-
-        /* Dragon Massive Scaled Boss Mode */
-        .theme-dragon { transform: scale(1.55); }
-        .theme-dragon .horns { display: flex; }
-        .theme-dragon .horns .horn { border-bottom-color: #2ecc71; height: 16px; width: 0; border-left-width: 6px; border-right-width: 6px; }
-        .theme-dragon .wings { display: block; width: 80px; height: 50px; top: 20px; }
-        .theme-dragon .wing-l, .theme-dragon .wing-r { background: #1e3f20; border: 2px solid #2ecc71; width: 45px; height: 25px; }
-        .theme-dragon .torso { width: 16px; left: 37px; background: #142e16; border: 1px solid #2ecc71; }
-
-        /* Wings Architectural Rules */
-        .wings { display: none; position: absolute; top: 25px; left: 5px; width: 80px; height: 40px; opacity: 0.85; z-index: 0; }
-        .wing-l, .wing-r { position: absolute; width: 38px; height: 22px; transform-origin: bottom right; transition: transform 0.15s ease-in-out; }
-        .wing-l { left: -10px; transform: rotate(-20deg); animation: flapL 0.6s infinite alternate; }
-        .wing-r { right: -10px; transform: scaleX(-1) rotate(-20deg); animation: flapR 0.6s infinite alternate; }
-
-        @keyframes flapL { 0% { transform: rotate(-25deg); } 100% { transform: rotate(-5deg); } }
-        @keyframes flapR { 0% { transform: scaleX(-1) rotate(-25deg); } 100% { transform: scaleX(-1) rotate(-5deg); } }
-
-        /* --- CONTAINED LIMB FLASH ANIMATIONS --- */
-        .anim-punch .arm-right { 
-            transform: rotate(5deg) scaleX(1.3); width: 46px; 
-            background: #fff !important; box-shadow: 0 0 10px #fff; 
+        /* Deeper Wing Alignment Layout */
+        .theme-angel .wings, .theme-devil .wings, .theme-dragon .wings { 
+            display: block; top: -5px; left: 50%; transform: translateX(-50%); width: 90px; height: 40px; opacity: 0.85; z-index: -1;
         }
-        .anim-punch .torso { transform: rotate(6deg); }
-        
-        .anim-big-punch .arm-right { 
-            transform: rotate(-5deg) scaleX(1.7); width: 55px; 
-            background: #ffaa00 !important; box-shadow: 0 0 12px #ffaa00; 
-        }
-        .anim-big-punch .torso { transform: rotate(14deg); }
-        
-        /* Refined contained limb glow instead of wide layout-breaking flash bars */
-        .anim-kick .leg-right { 
-            transform: rotate(-30deg) scaleX(1.4); width: 52px; 
-            background: #fff !important; box-shadow: 0 0 10px #fff;
-        }
-        .anim-kick .torso { transform: rotate(-10deg); }
+        .wing-l, .wing-r { position: absolute; width: 45px; height: 25px; border-radius: 50% 50% 0 50%; background: var(--wing-color, #fff); transform-origin: right center; top: 0; }
+        .wing-l { left: -20px; transform: rotate(-15deg); }
+        .wing-r { right: -20px; transform: scaleX(-1) rotate(-15deg); transform-origin: left center; }
 
-        .anim-throw .arm-right { transform: rotate(-35deg) scaleX(1.4); background: #00f3ff !important; box-shadow: 0 0 8px #00f3ff; }
-        .anim-duck .sprite { transform: translateY(40px) scaleY(0.6) !important; }
-        .anim-duck#enemy .sprite { transform: scaleX(-1) translateY(40px) scaleY(0.6) !important; }
-        .anim-block .arm-left { transform: rotate(250deg) translate(4px, 10px); background: #55ff55 !important; }
-        .anim-block .arm-right { transform: rotate(275deg) translate(-4px, -10px); background: #55ff55 !important; }
-        
-        /* Localized target impact response */
-        .hit-target-flash { animation: flashRed 0.12s linear; }
-        @keyframes flashRed {
-            0% { filter: brightness(1.8) sepia(1) hue-rotate(-50deg); }
-            100% { filter: none; }
-        }
+        /* Halo Specification */
+        .halo { position: absolute; top: -12px; left: -3px; width: 36px; height: 8px; border-radius: 50%; border: 2px solid #ffd700; box-shadow: 0 0 8px #ffd700; z-index: 5; }
 
-        /* Projectiles Layer */
-        .projectile {
-            position: absolute; z-index: 15; font-size: 32px;
-            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
-            will-change: transform;
-        }
-        
-        /* Leaderboard table designs */
-        table { width: 90%; border-collapse: collapse; margin: 15px 0; font-size: 0.9rem; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #333; }
-        th { color: #ff2a35; text-transform: uppercase; }
+        /* --- CHARACTER DESIGN PROFILES --- */
+        /* Speedways Profile */
+        .theme-speedways { transform: none; }
+        .theme-speedways .head { background: #fcd5b5; border-color: #333; }
+        .theme-speedways .acc-hat { display: block; top: -10px; left: -3px; width: 36px; height: 6px; background: #000; border-radius: 1px; z-index: 6; }
+        .theme-speedways .acc-hat::after { content:''; position: absolute; top: -6px; left: 6px; border-bottom: 6px solid #000; border-left: 12px solid transparent; border-right: 12px solid transparent; }
+        .theme-speedways .torso { background: #7f8c8d; width: 10px; }
+        .theme-speedways .arm { background: #7f8c8d; position: relative; }
+        .theme-speedways .arm::after { content: ''; position: absolute; right: 8px; top: 1px; width: 6px; height: 3px; background: #8b5a2b; border-radius: 1px; }
+        .theme-speedways .leg { background: #111; }
 
-        /* --- MOBILE LAYOUT OVERLAY INTERFACES --- */
-        #mobile-controls {
-            display: none;
-            width: 100%;
-            max-width: 800px;
-            background: #09090e;
-            border: 4px solid #222;
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            padding: 12px;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        /* Lee Profile */
+        .theme-lee .acc-mask { display: block; top: 4px; left: -2px; width: 34px; height: 12px; background: #e51b24; z-index: 4; opacity: 0.9; }
+        .theme-lee .torso { background: #111; border-left: 3px solid #e51b24; }
+
+        /* Dom Profile */
+        .theme-dom { transform: scale(1.2) !important; }
+        .theme-dom .torso { width: 12px; background: linear-gradient(to bottom, #008C45 33%, #F4F5F0 33%, #F4F5F0 66%, #CD212A 66%); }
+        .theme-dom .arm { width: 42px; height: 7px; }
+
+        /* Spaniard Profile */
+        .theme-spaniard { transform: scale(0.5) !important; }
+        .theme-spaniard .torso { width: 10px; background: linear-gradient(to bottom, #AA151B 25%, #F1BF00 25%, #F1BF00 75%, #AA151B 75%); }
+
+        /* Catterson Profile */
+        .theme-catterson .acc-clover { display: block; top: 10px; left: -8px; color: #008000; font-size: 20px; text-shadow: 0 0 2px #fff; }
+
+        /* Jeff Profile */
+        .theme-jeff .head { width: 34px; height: 34px; top: 10px; left: 28px; background: #111; border-color: #333; border-radius: 50%; }
+        .theme-jeff .eyes .eye { background: #fff; }
+        .theme-jeff .torso { background: #fff; }
+        .theme-jeff .arm, .theme-jeff .leg { background: #fff; }
+
+        /* Angel Profile */
+        .theme-angel .head { background: #fff; border-color: #fff; }
+        .theme-angel .eyes .eye { background: #ffd700; }
+        .theme-angel .torso { background: #fff; border-bottom: 4px solid #ffd700; }
+        .theme-angel .arm, .theme-angel .leg { background: #fff; }
+        .theme-angel .halo { display: block; }
+        .theme-angel .wings { --wing-color: #ffffff; }
+
+        /* Blue Ninja Profile */
+        .theme-ninja-enemy .head { background: #111; border-color: #111; }
+        .theme-ninja-enemy .eyes .eye { background: #00f3ff; }
+        .theme-ninja-enemy .acc-mask { display: block; top: 4px; left: -2px; width: 34px; height: 10px; background: #0044ff; z-index: 4; }
+        .theme-ninja-enemy .acc-mask::after { content: ''; position: absolute; right: -6px; top: 1px; width: 8px; height: 3px; background: #0044ff; transform: rotate(20deg); box-shadow: 0 3px 0 #0044ff; }
+        .theme-ninja-enemy .torso { background: #111; border-bottom: 4px solid #0044ff; }
+        .theme-ninja-enemy .arm, .theme-ninja-enemy .leg { background: #111; }
+
+        /* Devil Profile */
+        .theme-devil .head { background: #222; border-color: #ff2a35; }
+        .theme-devil .eyes .eye { background: #ff2a35; }
+        .theme-devil .torso { background: #ff2a35; }
+        .theme-devil .wings { --wing-color: #500; }
+
+        /* Dragon Boss Profile */
+        .theme-dragon { transform: scale(2.0) !important; filter: drop-shadow(0 0 12px #ff6600); }
+        .theme-dragon .head { background: #000; border-color: #ff5500; }
+        .theme-dragon .eyes .eye { background: #ff0000; }
+        .theme-dragon .torso { background: #000; }
+        .theme-dragon .arm, .theme-dragon .leg { background: #000; }
+        .theme-dragon .wings { --wing-color: #111; }
+        .theme-dragon .horns .horn { border-bottom-color: #ff0000; }
+
+        /* Contained Striking Modifications */
+        .anim-punch .arm-right { transform: rotate(5deg) scaleX(1.3); width: 46px; background: #fff; box-shadow: 0 0 12px #fff; }
+        .anim-punch .torso { transform: rotate(8deg); }
+        
+        .anim-big-punch .arm-right { transform: rotate(-5deg) scaleX(1.7); width: 55px; background: #ffaa00; box-shadow: 0 0 15px #ffaa00; }
+        .anim-big-punch .torso { transform: rotate(18deg); }
+        
+        .anim-kick .leg-right { transform: rotate(-25deg) scaleX(1.4); width: 52px; background: #fff; box-shadow: 0 0 8px #fff; }
+        .anim-kick .torso { transform: rotate(-12deg); }
+
+        .anim-throw .arm-right { transform: rotate(-45deg) scaleX(1.5); background: #00f3ff; }
+        .anim-duck .sprite { transform: translateY(45px) scaleY(0.55) !important; }
+        .anim-duck#enemy .sprite { transform: scaleX(-1) translateY(45px) scaleY(0.55) !important; }
+        .anim-block .arm-left { transform: rotate(260deg) translate(5px, 12px); background: #55ff55; }
+        .anim-block .arm-right { transform: rotate(280deg) translate(-5px, -12px); background: #55ff55; }
+        
+        .hit-flash { filter: brightness(2.5) drop-shadow(0 0 12px #ff2a35); }
+
+        /* Projectiles */
+        .projectile { position: absolute; z-index: 15; font-size: 28px; text-shadow: 0 0 5px rgba(255,255,255,0.5); transition: transform 0.05s linear; }
+        
+        /* Leaderboard table layout */
+        table { width: 80%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #444; }
+
+        /* ERGONOMIC VIRTUAL KEYPAD MATRIX */
+        #mobile-keypad {
+            display: none; width: 800px; height: 140px; background: #141420; border: 4px solid #444;
+            border-top: none; justify-content: space-between; align-items: center; padding: 10px 30px;
         }
 
-        .dpad, .action-pad {
+        /* Stacked D-Pad Area Layout */
+        .dpad {
             display: grid;
-            gap: 8px;
+            grid-template-areas: 
+                ". up ."
+                "left down right";
+            grid-template-columns: 60px 60px 60px;
+            grid-template-rows: 55px 55px;
+            gap: 6px;
         }
-        .dpad { grid-template-columns: repeat(3, 1fr); max-width: 260px; }
-        .action-pad { grid-template-columns: repeat(3, 1fr); }
+        .btn-up { grid-area: up; }
+        .btn-left { grid-area: left; }
+        .btn-right { grid-area: right; }
+        .btn-down { grid-area: down; }
 
-        .joy-btn {
-            background: linear-gradient(to bottom, #1c1c2e, #12121f);
-            border: 2px solid #444;
-            color: #fff;
-            padding: 14px 5px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            border-radius: 8px;
-            text-align: center;
-            text-transform: uppercase;
-            box-shadow: inset 0 2px 3px rgba(255,255,255,0.1), 0 3px 5px rgba(0,0,0,0.4);
-            cursor: pointer;
-            touch-action: manipulation;
+        /* Action Grid Configuration Matrix */
+        .action-matrix {
+            display: grid;
+            grid-template-areas:
+                ". bpunch ."
+                "punch . proj"
+                ". kick .";
+            grid-template-columns: 50px 50px 50px;
+            grid-template-rows: 40px 40px 40px;
+            gap: 6px;
         }
-        .joy-btn:active {
-            background: #ff2a35;
-            border-color: #fff;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
-            transform: scale(0.96);
-        }
-        .joy-btn.span-2 { grid-column: span 2; }
-        .joy-btn.block-btn { background: linear-gradient(to bottom, #1b3a22, #112415); border-color: #2ecc71; }
-        .joy-btn.block-btn:active { background: #2ecc71; }
+        .btn-bpunch { grid-area: bpunch; }
+        .btn-punch { grid-area: punch; }
+        .btn-proj { grid-area: proj; }
+        .btn-kick { grid-area: kick; }
 
-        /* Fit Frame Mechanics Trigger UI */
-        #frame-adjust-bar {
-            width: 100%;
-            max-width: 800px;
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 6px;
-            gap: 10px;
+        #mobile-keypad button {
+            background: #222234; color: #fff; border: 2px solid #555; border-radius: 8px;
+            font-size: 1.1rem; font-weight: bold; display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 100%; padding: 0; cursor: pointer;
         }
-        .utility-btn {
-            padding: 6px 12px;
-            font-size: 0.75rem;
-            background: #222;
-            border: 1px solid #555;
-            border-radius: 4px;
-        }
+        #mobile-keypad button:active { background: #ff2a35; border-color: #fff; }
 
-        /* Landscape orientation optimizations */
-        @media (max-width: 850px) or (max-device-width: 932px) {
-            body { justify-content: flex-start; padding-top: 5px; }
-            #mobile-controls { display: grid; }
+        @media (max-width: 900px) or (pointer: coarse) {
+            #mobile-keypad { display: flex; }
         }
     </style>
 </head>
 <body>
 
-    <div id="frame-adjust-bar">
-        <button class="utility-btn" onclick="fitToFrame()">Fit to Frame</button>
-    </div>
+    <button id="fit-frame-btn" style="position: fixed; top: 12px; right: 12px; z-index: 100; font-size: 0.85rem; padding: 8px 14px; background:#222; color:#fff; border:2px solid #555; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="toggleFitFrame()">FIT TO FRAME</button>
 
-    <div id="game-wrapper">
+    <div id="super-container">
         <div id="game-container">
-            
             <div id="projectile-layer"></div>
 
             <div id="hud" class="hidden">
@@ -331,12 +283,16 @@ Here is the fully expanded, highly optimized, and feature-rich version of **"Dom
             <div id="player" class="fighter hidden" style="--char-color: #3498db;">
                 <div class="sprite" id="player-sprite">
                     <div class="head">
+                        <div class="horns"><div class="horn"></div><div class="horn horn-r"></div></div>
                         <div class="accessory acc-hat"></div>
                         <div class="accessory acc-mask"></div>
                         <div class="accessory acc-visor"></div>
                         <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
                     </div>
-                    <div class="torso"><div class="accessory acc-clover">♣</div></div>
+                    <div class="torso">
+                        <div class="wings"><div class="wing-l"></div><div class="wing-r"></div></div>
+                        <div class="accessory acc-clover">♣</div>
+                    </div>
                     <div class="arm arm-left"></div>
                     <div class="arm arm-right"></div>
                     <div class="leg leg-left"></div>
@@ -347,6 +303,7 @@ Here is the fully expanded, highly optimized, and feature-rich version of **"Dom
             <div id="enemy" class="fighter hidden" style="--char-color: #f1c40f;">
                 <div class="sprite" id="enemy-sprite">
                     <div class="head">
+                        <div class="halo"></div>
                         <div class="horns"><div class="horn"></div><div class="horn horn-r"></div></div>
                         <div class="accessory acc-mask"></div>
                         <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
@@ -370,7 +327,7 @@ Here is the fully expanded, highly optimized, and feature-rich version of **"Dom
             </div>
 
             <div id="char-select-screen" class="screen hidden">
-                <h2 style="margin-bottom:20px;">Choose Your Fighter</h2>
+                <h1 style="font-size: 2rem;">Choose Your Fighter</h1>
                 <div class="char-grid">
                     <button class="char-btn" onclick="selectCharacter('speedways')"><span>📖</span>Speedways</button>
                     <button class="char-btn" onclick="selectCharacter('lee')"><span>🍣</span>Lee</button>
@@ -379,63 +336,59 @@ Here is the fully expanded, highly optimized, and feature-rich version of **"Dom
                     <button class="char-btn" onclick="selectCharacter('catterson')"><span>🔪</span>Catterson</button>
                     <button class="char-btn" onclick="selectCharacter('jeff')"><span>🛞</span>Jeff</button>
                 </div>
-                <button style="margin-top:20px; width:200px; background:#333;" onclick="showScreen('home-screen')">Back</button>
+                <button style="margin-top:20px; background:#444;" onclick="showScreen('home-screen')">Back</button>
             </div>
 
             <div id="diff-screen" class="screen hidden">
-                <h2>Select Difficulty</h2>
+                <h1 style="font-size: 2rem;">Select Difficulty</h1>
                 <div class="menu-group">
-                    <button onclick="startGame('easy')">Easy Mode</button>
-                    <button onclick="startGame('medium')">Medium Mode</button>
-                    <button onclick="startGame('hard')">Hardcore Mode</button>
+                    <button onclick="startGame('easy')">Easy</button>
+                    <button onclick="startGame('medium')">Medium</button>
+                    <button onclick="startGame('hard')">Hard</button>
                 </div>
-                <button style="margin-top:20px; width:200px; background:#333;" onclick="showScreen('char-select-screen')">Back</button>
             </div>
 
             <div id="gameover-screen" class="screen hidden">
                 <h1 id="win-loss-title">MATCH OVER</h1>
-                <p id="score-reporting" style="margin-bottom: 20px; color: #ffd700; font-size: 1.3rem; font-weight: bold;"></p>
+                <p id="score-reporting" style="margin-bottom: 15px; color: #ffd700;"></p>
                 <div class="menu-group">
-                    <button onclick="showLeaderboardInput()">Save Highscore</button>
-                    <button onclick="returnToHome()">Main Menu</button>
+                    <button onclick="showLeaderboardInput()">Save Score</button>
+                    <button onclick="returnToHome()">Home</button>
                 </div>
             </div>
 
             <div id="leaderboard-screen" class="screen hidden">
                 <h1>Leaderboard</h1>
-                <div style="width:100%; display:flex; flex-direction:column; align-items:center; max-height:220px; overflow-y:auto;">
+                <div id="leaderboard-area" style="width:100%; display:flex; flex-direction:column; align-items:center;">
                     <table id="scores-table">
                         <thead><tr><th>Rank</th><th>Name</th><th>Level</th><th>Score</th></tr></thead>
                         <tbody id="leaderboard-body"></tbody>
                     </table>
                 </div>
-                <div class="menu-group" style="margin-top:20px;">
-                    <button onclick="returnToHome()">Back Menu</button>
+                <div class="menu-group" style="margin-top:10px;">
+                    <button onclick="returnToHome()">Back To Menu</button>
                 </div>
             </div>
         </div>
 
-        <div id="mobile-controls">
+        <div id="mobile-keypad">
             <div class="dpad">
-                <button class="joy-btn" id="btn-m-jump">JUMP</button>
-                <div></div>
-                <button class="joy-btn block-btn" id="btn-m-block">BLOCK</button>
-                <button class="joy-btn" id="btn-m-left">◀</button>
-                <button class="joy-btn" id="btn-m-duck">DUCK</button>
-                <button class="joy-btn" id="btn-m-right">▶</button>
+                <button class="btn-up" ontouchstart="handleMobileInput('up', event)">▲</button>
+                <button class="btn-left" ontouchstart="handleMobileInput('left-start', event)" ontouchend="handleMobileInput('left-end', event)">◀</button>
+                <button class="btn-right" ontouchstart="handleMobileInput('right-start', event)" ontouchend="handleMobileInput('right-end', event)">▶</button>
+                <button class="btn-down" ontouchstart="handleMobileInput('down-start', event)" ontouchend="handleMobileInput('down-end', event)">▼</button>
             </div>
-            <div class="action-pad">
-                <button class="joy-btn" id="btn-m-punch">PUNCH</button>
-                <button class="joy-btn" id="btn-m-big-punch">B-PUNCH</button>
-                <button class="joy-btn" id="btn-m-kick">KICK</button>
-                <button class="joy-btn span-2" id="btn-m-proj" style="background: linear-gradient(to bottom, #1d3644, #12222b); border-color:#00f3ff;">PROJECTILE</button>
+            <div class="action-matrix">
+                <button class="btn-bpunch" ontouchstart="handleMobileInput('bigpunch', event)">BP</button>
+                <button class="btn-punch" ontouchstart="handleMobileInput('punch', event)">P</button>
+                <button class="btn-proj" ontouchstart="handleMobileInput('proj', event)">FR</button>
+                <button class="btn-kick" ontouchstart="handleMobileInput('kick', event)">K</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Config and Engine Definitions
-        const config = { width: 800, baseSpeed: 5.5, gravity: 0.65, groundY: 25 };
+        const config = { width: 800, baseSpeed: 5.5, gravity: 0.65, groundY: 20 };
 
         let state = {
             playerCharKey: 'dom', difficulty: 'medium', currentLevel: 1, score: 0, 
@@ -444,81 +397,82 @@ Here is the fully expanded, highly optimized, and feature-rich version of **"Dom
         };
 
         const charData = {
-            'speedways': { name: "Speedways", color: "#3498db", theme: "theme-speedways", proj: "📖", scale: 1.0 },
-            'lee': { name: "Lee", color: "#222", theme: "theme-lee", proj: "🍣", scale: 1.0 },
-            'dom': { name: "Dom", color: "#008C45", theme: "theme-dom", proj: "🍕", scale: 1.22 },
-            'spaniard': { name: "Spaniard", color: "#AA151B", theme: "theme-spaniard", proj: "🥖", scale: 0.72 },
-            'catterson': { name: "Catterson", color: "#2ecc71", theme: "theme-catterson", proj: "🔪", scale: 1.0 },
-            'jeff': { name: "Jeff", color: "#ffd700", theme: "theme-jeff", proj: "🛞", scale: 1.0 }
+            'speedways': { name: "Speedways", color: "#3498db", theme: "theme-speedways", proj: "📖" },
+            'lee': { name: "Lee", color: "#111", theme: "theme-lee", proj: "🍣" },
+            'dom': { name: "Dom", color: "#008C45", theme: "theme-dom", proj: "🍕" },
+            'spaniard': { name: "Spaniard", color: "#AA151B", theme: "theme-spaniard", proj: "🥖" },
+            'catterson': { name: "Catterson", color: "#008000", theme: "theme-catterson", proj: "🔪" },
+            'jeff': { name: "Jeff", color: "#111", theme: "theme-jeff", proj: "🛞" }
         };
 
         const levelData = {
-            1: { name: "Angel", color: "#f1c40f", theme: "theme-angel", proj: "⚡", health: 100, aiSpeed: 2.2, scale: 1.0 },
-            2: { name: "Ninja", color: "#00f3ff", theme: "theme-ninja-enemy", proj: "✺", health: 140, aiSpeed: 3.8, scale: 1.0 },
-            3: { name: "Devil", color: "#9b59b6", theme: "theme-devil", proj: "🔥", health: 190, aiSpeed: 5.2, scale: 1.0 },
-            4: { name: "Dragon Boss", color: "#2ecc71", theme: "theme-dragon", proj: "☄️", health: 260, aiSpeed: 4.0, scale: 1.55 }
+            1: { name: "Angel", color: "#ffffff", theme: "theme-angel", proj: "⚡", health: 100, aiSpeed: 2.2 },
+            2: { name: "Ninja", color: "#111", theme: "theme-ninja-enemy", proj: "✺", health: 135, aiSpeed: 3.8 },
+            3: { name: "Devil", color: "#8e44ad", theme: "theme-devil", proj: "🔥", health: 180, aiSpeed: 5.8 },
+            4: { name: "Dragon", color: "#000000", theme: "theme-dragon", proj: "☄️", health: 250, aiSpeed: 6.5 }
         };
 
-        // Complete structural physics variables
         let player = { x: 100, y: 0, vx: 0, vy: 0, health: 100, isAttacking: false, isDucking: false, isBlocking: false, isJumping: false, lastProj: 0 };
-        let enemy = { x: 600, y: 0, vx: 0, vy: 0, health: 100, isAttacking: false, isJumping: false, lastAttackTime: 0, lastProj: 0, dragonAngle: 0 };
+        let enemy = { x: 600, y: 0, vy: 0, health: 100, isAttacking: false, isJumping: false, lastAttackTime: 0, lastProj: 0 };
         let leaderboard = [];
-        
-        // Touch Input Flags Mapping Matrix
-        const keys = { Left: false, Right: false, Duck: false, Block: false };
+        let isFitFrame = false;
 
-        // Realtime WebAudio Frequency Oscillator Engine
+        // Unified Audio Context Engine
         let audioCtx = null;
         function initAudio() { 
             if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
             }
         }
 
         function playTone(freq, type, dur, vol, slide = null) {
             if (!audioCtx) return;
             try {
-                let osc = audioCtx.createOscillator(); 
-                let gain = audioCtx.createGain();
-                osc.type = type; 
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                if (slide) {
-                    osc.frequency.exponentialRampToValueAtTime(slide, audioCtx.currentTime + dur);
-                }
+                let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+                osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                if (slide) osc.frequency.exponentialRampToValueAtTime(slide, audioCtx.currentTime + dur);
                 gain.gain.setValueAtTime(vol, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-                osc.connect(gain); 
-                gain.connect(audioCtx.destination);
-                osc.start(); 
-                osc.stop(audioCtx.currentTime + dur);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + dur);
             } catch(e) {}
         }
 
-        function soundFx(type) {
-            if (!audioCtx) return;
-            if (type === 'punch') playTone(220, 'triangle', 0.1, 0.4, 70);
-            if (type === 'bigpunch') playTone(140, 'sawtooth', 0.22, 0.6, 40);
-            if (type === 'kick') playTone(180, 'triangle', 0.14, 0.45, 50);
-            if (type === 'jump') playTone(240, 'sine', 0.16, 0.2, 450);
-            if (type === 'block') playTone(100, 'square', 0.08, 0.35, 90);
-            if (type === 'hit') playTone(320, 'sawtooth', 0.09, 0.5, 80);
-            if (type === 'throw') playTone(550, 'sine', 0.18, 0.3, 150);
+        function soundFx(type, heavy = false) {
+            let factor = heavy ? 0.5 : 1.0;
+            let durationScale = heavy ? 1.5 : 1.0;
+
+            if (type === 'punch') playTone(180 * factor, 'triangle', 0.12 * durationScale, 0.4, 60 * factor);
+            if (type === 'bigpunch') playTone(120 * factor, 'sawtooth', 0.25 * durationScale, 0.6, 30 * factor);
+            if (type === 'kick') playTone(150 * factor, 'triangle', 0.15 * durationScale, 0.45, 40 * factor);
+            if (type === 'jump') playTone(200 * factor, 'sine', 0.18 * durationScale, 0.25, 400 * factor);
+            if (type === 'block') playTone(90 * factor, 'square', 0.1 * durationScale, 0.3, 80 * factor);
+            if (type === 'hit') playTone(300 * factor, 'sawtooth', 0.1 * durationScale, 0.5, 90 * factor);
+            if (type === 'throw') playTone(600 * factor, 'sine', 0.2 * durationScale, 0.3, 100 * factor);
         }
 
         function playBeatStep() {
             if (!state.gameActive) return;
             state.musicStep = (state.musicStep + 1) % 8;
-            let notes = [55, 55, 65, 55, 70, 55, 60, 50];
-            if (state.musicStep % 2 === 0) {
-                playTone(notes[state.musicStep], 'triangle', 0.18, 0.15);
-            }
-            if (state.musicStep === 2 || state.musicStep === 6) {
-                playTone(200, 'square', 0.05, 0.04, 60);
-            }
+            let bassNotes = [55, 55, 65, 55, 73, 55, 65, 49];
+            let isHeavy = (state.currentLevel === 4);
+            let targetNote = isHeavy ? bassNotes[state.musicStep] * 0.75 : bassNotes[state.musicStep];
+            
+            if (state.musicStep % 2 === 0) playTone(targetNote, 'triangle', 0.2, 0.18);
+            if (state.musicStep === 2 || state.musicStep === 6) playTone(220, 'square', 0.06, 0.06, 80);
         }
 
-        // Context Router screens management
+        // Window interaction setup for Desktop Silence bypass
+        window.addEventListener('click', initAudio);
+        window.addEventListener('keydown', initAudio);
+        window.addEventListener('touchstart', initAudio);
+
+        // Screen Navigation
         function showScreen(id) {
+            initAudio();
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
@@ -528,7 +482,9 @@ Here is the fully expanded, highly optimized, and feature-rich version of **"Dom
             showScreen('diff-screen');
         }
 
-        // Desktop keyboard maps
+        // Desktop Input Registry
+        const keys = { Left: false, Right: false, Duck: false, Block: false };
+
         window.addEventListener('keydown', e => {
             if(!state.gameActive) return;
             if(e.code === 'KeyA' || e.code === 'ArrowLeft') keys.Left = true;
@@ -537,7 +493,7 @@ Here is the fully expanded, highly optimized, and feature-rich version of **"Dom
             if(e.code === 'Space') keys.Block = true;
             
             if((e.code === 'KeyW' || e.code === 'ArrowUp') && !player.isJumping && !player.isDucking && !player.isBlocking) {
-                player.vy = -14.5; player.isJumping = true; soundFx('jump');
+                player.vy = -14; player.isJumping = true; soundFx('jump');
             }
             if(e.code === 'KeyJ') performAttack('punch');
             if(e.code === 'KeyU') performAttack('big-punch');
@@ -552,37 +508,49 @@ Here is the fully expanded, highly optimized, and feature-rich version of **"Dom
             if(e.code === 'Space') keys.Block = false;
         });
 
-        // Setup mobile layout listeners cleanly mapping to central system keys
-        function bindMobileBtn(id, targetKey) {
-            const btn = document.getElementById(id);
-            if(!btn) return;
-            btn.addEventListener('touchstart', e => { e.preventDefault(); initAudio(); keys[targetKey] = true; });
-            btn.addEventListener('touchend', e => { e.preventDefault(); keys[targetKey] = false; });
-        }
-        
-        bindMobileBtn('btn-m-left', 'Left');
-        bindMobileBtn('btn-m-right', 'Right');
-        bindMobileBtn('btn-m-duck', 'Duck');
-        bindMobileBtn('btn-m-block', 'Block');
-
-        document.getElementById('btn-m-jump').addEventListener('touchstart', e => {
-            e.preventDefault();
-            if(state.gameActive && !player.isJumping && !player.isDucking && !player.isBlocking) {
-                player.vy = -14.5; player.isJumping = true; soundFx('jump');
+        // Touch Input Ergonomic Route Controller
+        function handleMobileInput(action, e) {
+            if(e) e.preventDefault();
+            initAudio();
+            if(!state.gameActive) return;
+            
+            switch(action) {
+                case 'left-start': keys.Left = true; break;
+                case 'left-end': keys.Left = false; break;
+                case 'right-start': keys.Right = true; break;
+                case 'right-end': keys.Right = false; break;
+                case 'down-start': keys.Duck = true; break;
+                case 'down-end': keys.Duck = false; break;
+                case 'up': 
+                    if(!player.isJumping && !player.isDucking && !player.isBlocking) {
+                        player.vy = -14; player.isJumping = true; soundFx('jump');
+                    }
+                    break;
+                case 'punch': performAttack('punch'); break;
+                case 'bigpunch': performAttack('big-punch'); break;
+                case 'kick': performAttack('kick'); break;
+                case 'proj': fireProjectile(true); break;
             }
-        });
-        document.getElementById('btn-m-punch').addEventListener('touchstart', e => { e.preventDefault(); performAttack('punch'); });
-        document.getElementById('btn-m-big-punch').addEventListener('touchstart', e => { e.preventDefault(); performAttack('big-punch'); });
-        document.getElementById('btn-m-kick').addEventListener('touchstart', e => { e.preventDefault(); performAttack('kick'); });
-        document.getElementById('btn-m-proj').addEventListener('touchstart', e => { e.preventDefault(); fireProjectile(true); });
+        }
 
-        // Core execution lifecycle initialization
+        function toggleFitFrame() {
+            initAudio();
+            const container = document.getElementById('super-container');
+            isFitFrame = !isFitFrame;
+            if (isFitFrame) {
+                const scaleX = window.innerWidth / 840;
+                const scaleY = window.innerHeight / 560;
+                const scale = Math.min(scaleX, scaleY);
+                container.style.transform = `scale(${scale})`;
+                container.style.transformOrigin = 'center center';
+            } else {
+                container.style.transform = 'none';
+            }
+        }
+
         function startGame(difficulty) {
             initAudio();
-            state.difficulty = difficulty; 
-            state.currentLevel = 1; 
-            state.score = 0; 
-            state.activeProjectiles = [];
+            state.difficulty = difficulty; state.currentLevel = 1; state.score = 0; state.activeProjectiles = [];
             document.getElementById('projectile-layer').innerHTML = '';
             
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
@@ -593,20 +561,15 @@ Here is the fully expanded, highly optimized, and feature-rich version of **"Dom
             
             setupLevel(state.currentLevel);
             
-            clearInterval(state.timerInterval); 
-            clearInterval(state.musicInterval);
-            state.timeLeft = 180; // Extended timeout matrix implementation
-            document.getElementById('timer').innerText = state.timeLeft;
+            clearInterval(state.timerInterval); clearInterval(state.musicInterval);
+            state.timeLeft = 180; document.getElementById('timer').innerText = state.timeLeft;
             
             state.timerInterval = setInterval(() => {
                 if(!state.gameActive) return;
-                state.timeLeft--; 
-                document.getElementById('timer').innerText = state.timeLeft;
-                if(state.timeLeft <= 0) endGame(false, "TIME EXPIRED!");
+                state.timeLeft--; document.getElementById('timer').innerText = state.timeLeft;
+                if(state.timeLeft <= 0) endGame(false, "TIME UP!");
             }, 1000);
-            
             state.musicInterval = setInterval(playBeatStep, 220);
-            fitToFrame();
 
             window.requestAnimationFrame(updateFrameLoop);
         }
@@ -615,8 +578,8 @@ Here is the fully expanded, highly optimized, and feature-rich version of **"Dom
             const eData = levelData[lvl];
             const pData = charData[state.playerCharKey];
             
-            player.health = 100; player.x = 120; player.y = 0; player.vy = 0;
-            enemy.health = eData.health; enemy.x = 580; enemy.y = 0; enemy.vy = 0;
+            player.health = 100; player.x = 100; player.y = 0;
+            enemy.health = eData.health; enemy.x = 600; enemy.y = 0;
             state.activeProjectiles = [];
             document.getElementById('projectile-layer').innerHTML = '';
 
@@ -635,126 +598,67 @@ Here is the fully expanded, highly optimized, and feature-rich version of **"Dom
             updateVisuals();
         }
 
-        // Synchronized Frame Loop
         function updateFrameLoop() {
             if(!state.gameActive) return;
-            
-            const pEl = document.getElementById('player'); 
-            const eEl = document.getElementById('enemy');
+            const pEl = document.getElementById('player'); const eEl = document.getElementById('enemy');
             
             player.isDucking = keys.Duck && !player.isJumping;
             player.isBlocking = keys.Block && !player.isDucking && !player.isJumping;
-            
-            pEl.classList.toggle('anim-duck', player.isDucking); 
-            pEl.classList.toggle('anim-block', player.isBlocking);
+            pEl.classList.toggle('anim-duck', player.isDucking); pEl.classList.toggle('anim-block', player.isBlocking);
 
-            // Universal Gravity Physics Mechanics
-            if(player.isJumping) { 
-                player.vy += config.gravity; 
-                player.y += player.vy; 
-                if(player.y >= 0) { player.y = 0; player.vy = 0; player.isJumping = false; } 
-            }
+            // Gravity Configuration Physics
+            if(player.isJumping) { player.vy += config.gravity; player.y += player.vy; if(player.y >= 0) { player.y = 0; player.isJumping = false; } }
             
-            // Level 4 Dragon Flight Mechanics Rule
-            const isDragon = levelData[state.currentLevel].theme === 'theme-dragon';
-            if(!isDragon) {
-                if(enemy.isJumping) { 
-                    enemy.vy += config.gravity; 
-                    enemy.y += enemy.vy; 
-                    if(enemy.y >= 0) { enemy.y = 0; enemy.vy = 0; enemy.isJumping = false; } 
-                }
+            // Dragon Glide/Flying Independent Engine Module
+            if (state.currentLevel === 4) {
+                enemy.y = -60 + Math.sin(Date.now() / 200) * 25;
+            } else {
+                if(enemy.isJumping) { enemy.vy += config.gravity; enemy.y += enemy.vy; if(enemy.y >= 0) { enemy.y = 0; enemy.isJumping = false; } }
             }
 
-            // --- FLUID SEPARATE CHARACTER MOVEMENT PROCESSING MODULE ---
-            const pScale = charData[state.playerCharKey].scale;
-            const eScale = levelData[state.currentLevel].scale;
-            
-            const pWidth = 65 * pScale;
-            const eWidth = 65 * eScale;
+            // Dedicated Vector Physics Scaler
+            let speedMod = config.baseSpeed;
+            if (state.playerCharKey === 'spaniard') speedMod *= 1.5;
 
-            // Player localized scaling logic rules execution
             player.vx = 0;
             if(!player.isDucking && !player.isBlocking && !player.isAttacking) {
-                let speedMod = 1.0;
-                if (state.playerCharKey === 'dom') speedMod = 1.15; // Dom Fluid Vector Speed allocation
-                if (state.playerCharKey === 'spaniard') speedMod = 1.35; // Spaniard Quick Vector Velocity allocation
-
-                if(keys.Left) player.vx = -config.baseSpeed * speedMod;
-                if(keys.Right) player.vx = config.baseSpeed * speedMod;
+                if(keys.Left) player.vx = -speedMod;
+                if(keys.Right) player.vx = speedMod;
             }
             player.x += player.vx;
-
-            // Boundary limitations clamping based on custom bounding scale dimensions
+            
             if(player.x < 0) player.x = 0;
-            if(player.x > config.width - pWidth) player.x = config.width - pWidth;
+            let stopDist = (state.playerCharKey === 'spaniard') ? 15 : 35;
+            if(player.x > enemy.x - stopDist) player.x = enemy.x - stopDist;
 
-            // AI Logic Processing Routing
-            processEnemyAI(isDragon);
+            processEnemyAI();
             processProjectiles();
 
-            // Collision boundary push checks to ensure fighters don't blend visually
-            const centerDist = Math.abs((player.x + pWidth/2) - (enemy.x + eWidth/2));
-            const minAllowedDist = (pWidth + eWidth) * 0.42;
-
-            if (centerDist < minAllowedDist && !isDragon) {
-                if (player.x < enemy.x) {
-                    player.x -= 2;
-                    enemy.x += 2;
-                } else {
-                    player.x += 2;
-                    enemy.x -= 2;
-                }
-            }
-
-            // Write absolute translations to spatial interface rendering tree
             pEl.style.transform = `translate(${player.x}px, ${player.y}px)`;
             eEl.style.transform = `translate(${enemy.x}px, ${enemy.y}px)`;
 
             window.requestAnimationFrame(updateFrameLoop);
         }
 
-        // Fluid Enemy AI Processing Module
-        function processEnemyAI(isDragon) {
+        function processEnemyAI() {
             const ai = levelData[state.currentLevel];
-            let spd = ai.aiSpeed; 
-            let attackCooldown = 1300; 
-            let projChance = 0.02;
-            
-            if (state.difficulty === 'easy') { spd *= 0.5; attackCooldown = 2400; projChance = 0.006; } 
-            else if (state.difficulty === 'hard') { spd *= 1.4; attackCooldown = 700; projChance = 0.045; }
+            let spd = ai.aiSpeed; let atkInt = 1400; let projChance = 0.02;
+            if (state.difficulty === 'easy') { spd *= 0.4; atkInt = 2600; projChance = 0.005; } 
+            else if (state.difficulty === 'hard') { spd *= 1.35; atkInt = 750; projChance = 0.05; }
 
-            // --- DRAGON FLUID GLIDE HOVER ENGINE MODULE ---
-            if (isDragon) {
-                enemy.dragonAngle += 0.04;
-                enemy.y = -60 + Math.sin(enemy.dragonAngle) * 35; // Flight hovering floating dynamics
-                
-                // Swift responsive target hunting tracker
-                const targetX = player.x + 40;
-                if (enemy.x > targetX + 40) enemy.x -= spd * 1.2;
-                else if (enemy.x < targetX - 40) enemy.x += spd * 1.2;
-            } else {
-                // Ground based fighters routing velocity tracking
-                const dist = enemy.x - player.x;
-                if (!enemy.isAttacking) {
-                    if(dist > 85) enemy.x -= spd;
-                    else if (dist < 60) enemy.x += spd;
-                }
+            const dist = enemy.x - player.x;
+
+            if (!enemy.isAttacking) {
+                if(dist > (state.currentLevel === 4 ? 120 : 70)) enemy.x -= spd;
+                else if (dist < (state.currentLevel === 4 ? 90 : 55)) enemy.x += spd;
             }
-
-            // Arena border lock restrictions prevention clamping
-            if(enemy.x < 0) enemy.x = 0;
-            if(enemy.x > config.width - 110) enemy.x = config.width - 110;
+            if(enemy.x > config.width - 90) enemy.x = config.width - 90;
 
             const now = Date.now();
-            const currentDist = Math.abs(enemy.x - player.x);
-            
-            // Melee Combat Trigger range algorithms
-            let meleeRangeCheck = isDragon ? 140 : 105;
-            if(currentDist <= meleeRangeCheck && (now - enemy.lastAttackTime > attackCooldown)) {
-                performEnemyAttack(currentDist, isDragon);
+            if(dist <= 150 && (now - enemy.lastAttackTime > atkInt)) {
+                performEnemyAttack(dist);
             }
-            // Projectile Fire algorithm verification
-            else if (currentDist > 200 && now - enemy.lastProj > 2200 && Math.random() < projChance) {
+            else if (dist > 180 && now - enemy.lastProj > 2000 && Math.random() < projChance) {
                 fireProjectile(false);
             }
         }
@@ -763,34 +667,31 @@ Here is the fully expanded, highly optimized, and feature-rich version of **"Dom
             const now = Date.now();
             const source = isPlayer ? player : enemy;
             if(source.isAttacking || source.isBlocking || source.isDucking) return;
-            if(isPlayer && now - player.lastProj < 800) return; // Core cooldown restriction
+            if(isPlayer && now - player.lastProj < 1000) return;
             
-            source.isAttacking = true; 
-            source.lastProj = now;
-            soundFx('throw');
+            source.isAttacking = true; source.lastProj = now;
+            
+            let isHeavyBoss = !isPlayer && state.currentLevel === 4;
+            soundFx('throw', isHeavyBoss);
             
             const el = document.getElementById(isPlayer ? 'player' : 'enemy');
             el.classList.add('anim-throw');
 
             const symbol = isPlayer ? charData[state.playerCharKey].proj : levelData[state.currentLevel].proj;
-            const px = isPlayer ? source.x + 55 : source.x - 15;
-            const py = 310 + source.y; // Spatial alignment offset
+            const px = isPlayer ? source.x + 50 : source.x;
+            const py = 300 + source.y;
 
             const pDiv = document.createElement('div');
-            pDiv.className = 'projectile'; 
-            pDiv.innerText = symbol;
+            pDiv.className = 'projectile'; pDiv.innerText = symbol;
             document.getElementById('projectile-layer').appendChild(pDiv);
 
             state.activeProjectiles.push({
                 isPlayer: isPlayer, x: px, y: py,
-                vx: isPlayer ? 11 : -11,
+                vx: isPlayer ? 10 : -10,
                 el: pDiv, active: true
             });
 
-            setTimeout(() => { 
-                el.classList.remove('anim-throw'); 
-                source.isAttacking = false; 
-            }, 280);
+            setTimeout(() => { el.classList.remove('anim-throw'); source.isAttacking = false; }, 300);
         }
 
         function processProjectiles() {
@@ -803,201 +704,135 @@ Here is the fully expanded, highly optimized, and feature-rich version of **"Dom
                 const tx = target.x;
                 
                 let hit = false;
-                // Bound check tracking parameters
-                if(p.isPlayer && p.x > tx + 10 && p.x < tx + 80) hit = true;
-                if(!p.isPlayer && p.x < tx + 70 && p.x > tx - 10) hit = true;
+                if(p.isPlayer && p.x > tx && p.x < tx + 50) hit = true;
+                if(!p.isPlayer && p.x < tx + 50 && p.x > tx) hit = true;
 
                 if(hit) {
-                    p.active = false; 
-                    p.el.remove();
+                    p.active = false; p.el.remove();
+                    let targetIsDragon = (!p.isPlayer && state.currentLevel === 4);
                     
-                    if(!p.isPlayer && player.isDucking) return; // Projectile duck dodging system bypassed damage
-                    
-                    const tel = document.getElementById(p.isPlayer ? 'enemy' : 'player');
-                    
-                    if(!p.isPlayer && player.isBlocking) { 
-                        soundFx('block'); 
-                        target.health -= 3; 
-                    } else {
-                        soundFx('hit'); 
-                        target.health -= 14;
-                        tel.classList.add('hit-target-flash'); 
-                        setTimeout(() => tel.classList.remove('hit-target-flash'), 120);
+                    if(!p.isPlayer && player.isDucking) return; 
+                    if(!p.isPlayer && player.isBlocking) { soundFx('block', targetIsDragon); target.health -= 2; }
+                    else {
+                        soundFx('hit', targetIsDragon || p.isPlayer && state.currentLevel === 4); target.health -= 15;
+                        const tel = document.getElementById(p.isPlayer ? 'enemy' : 'player');
+                        tel.classList.add('hit-flash'); setTimeout(() => tel.classList.remove('hit-flash'), 120);
                         if(p.isPlayer) state.score += 15 * (state.difficulty === 'hard' ? 3 : 1);
                     }
                     checkMatch();
-                } else if (p.x < -60 || p.x > config.width + 60) {
-                    p.active = false; 
-                    p.el.remove();
+                } else if (p.x < -50 || p.x > config.width + 50) {
+                    p.active = false; p.el.remove();
                 }
             });
             state.activeProjectiles = state.activeProjectiles.filter(p => p.active);
         }
 
-        // Proximity tuned accurate player hit registration algorithm
+        // Proximity-Gated Hitbox Melee Module
         function performAttack(type) {
             if(!state.gameActive || player.isAttacking || player.isDucking || player.isBlocking) return;
             player.isAttacking = true;
+            const pEl = document.getElementById('player'); pEl.classList.add(`anim-${type}`);
             
-            const pEl = document.getElementById('player'); 
-            pEl.classList.add(`anim-${type}`);
-            
-            if(type === 'punch') soundFx('punch');
-            if(type === 'big-punch') soundFx('bigpunch');
-            if(type === 'kick') soundFx('kick');
+            soundFx(type.replace('-', ''));
 
-            const dist = Math.abs((enemy.x + 45) - (player.x + 45));
-            
-            // Strict range verification calculations
-            let strikeMin = 30;
-            let strikeMax = 80; // Punch close mechanics rule boundary
-            
-            if (type === 'kick') { strikeMin = 50; strikeMax = 110; } // Kick medium distance mechanics allocation
-            if (type === 'big-punch') { strikeMin = 40; strikeMax = 120; }
+            const dist = Math.abs(enemy.x - player.x);
+            let rng = 70; 
+            if(type === 'big-punch') rng = 95;
+            if(state.playerCharKey === 'dom') rng *= 1.2;
+            if(state.playerCharKey === 'spaniard') rng *= 0.6;
 
-            if(dist >= strikeMin && dist <= strikeMax) {
-                let dmg = type === 'big-punch' ? 24 : (type === 'kick' ? 15 : 10);
+            if(dist <= rng) {
+                let dmg = type === 'big-punch' ? 22 : (type === 'kick' ? 14 : 10);
                 enemy.health -= dmg;
                 state.score += dmg * (state.difficulty === 'hard' ? 3 : state.difficulty === 'medium' ? 2 : 1);
-                
-                soundFx('hit');
-                const eEl = document.getElementById('enemy'); 
-                eEl.classList.add('hit-target-flash');
-                setTimeout(() => eEl.classList.remove('hit-target-flash'), 120);
+                soundFx('hit', state.currentLevel === 4);
+                const eEl = document.getElementById('enemy'); eEl.classList.add('hit-flash');
+                setTimeout(() => eEl.classList.remove('hit-flash'), 120);
             }
 
-            setTimeout(() => { 
-                pEl.classList.remove(`anim-${type}`); 
-                player.isAttacking = false; 
-                checkMatch(); 
-            }, type === 'big-punch' ? 360 : 220);
+            setTimeout(() => { pEl.classList.remove(`anim-${type}`); player.isAttacking = false; checkMatch(); }, type === 'big-punch' ? 350 : 220);
         }
 
-        // Proximity tuned accurate enemy AI strike verification algorithm
-        function performEnemyAttack(dist, isDragon) {
-            enemy.lastAttackTime = Date.now(); 
-            enemy.isAttacking = true;
+        // Proximity-Gated Enemy Strike Logic
+        function performEnemyAttack(dist) {
+            enemy.lastAttackTime = Date.now(); enemy.isAttacking = true;
             const eEl = document.getElementById('enemy');
             
-            let atkType = Math.random() > 0.65 ? 'anim-kick' : 'anim-punch';
-            if((state.currentLevel >= 3) && Math.random() > 0.6) atkType = 'anim-big-punch';
+            let atkType = Math.random() > 0.6 ? 'anim-kick' : 'anim-punch';
+            if((state.currentLevel === 3 || state.currentLevel === 4) && Math.random() > 0.6) atkType = 'anim-big-punch';
             
             eEl.classList.add(atkType);
-            soundFx(atkType.includes('big') ? 'bigpunch' : (atkType.includes('kick') ? 'kick' : 'punch'));
+            let isHeavyBoss = (state.currentLevel === 4);
+            soundFx(atkType.includes('big') ? 'bigpunch' : (atkType.includes('kick') ? 'kick' : 'punch'), isHeavyBoss);
 
-            // Proximity tracking verification checking
-            let hitValid = false;
-            if (atkType === 'anim-punch' && dist <= 85) hitValid = true;
-            if (atkType === 'anim-kick' && dist <= 115) hitValid = true;
-            if (atkType === 'anim-big-punch' && dist <= 125) hitValid = true;
+            let rng = 75;
+            if(atkType === 'anim-big-punch') rng = 100;
+            if(state.currentLevel === 4) rng *= 1.8;
 
-            if(hitValid) {
-                if (player.isDucking && atkType !== 'anim-kick') {
-                    // Safe from punches under duck state criteria
-                } else {
-                    let baseDmg = state.currentLevel === 4 ? 20 : (state.currentLevel === 3 ? 15 : 11);
-                    if(atkType === 'anim-big-punch') baseDmg *= 1.5;
+            if(dist <= rng) {
+                if (player.isDucking && atkType !== 'anim-kick') {} 
+                else {
+                    let bdmg = state.currentLevel === 4 ? 20 : (state.currentLevel === 3 ? 16 : 11);
+                    if(atkType === 'anim-big-punch') bdmg = 25;
+                    if(state.difficulty === 'easy') bdmg *= 0.45; if(state.difficulty === 'hard') bdmg *= 1.5;
                     
-                    if(state.difficulty === 'easy') baseDmg *= 0.45; 
-                    if(state.difficulty === 'hard') baseDmg *= 1.45;
-                    
-                    if (player.isBlocking) { 
-                        baseDmg *= 0.15; 
-                        soundFx('block'); 
-                    } else {
-                        soundFx('hit'); 
-                        const pEl = document.getElementById('player');
-                        pEl.classList.add('hit-target-flash'); 
-                        setTimeout(() => pEl.classList.remove('hit-target-flash'), 120);
+                    if (player.isBlocking) { bdmg *= 0.15; soundFx('block', isHeavyBoss); } 
+                    else {
+                        soundFx('hit', isHeavyBoss); const pEl = document.getElementById('player');
+                        pEl.classList.add('hit-flash'); setTimeout(() => pEl.classList.remove('hit-flash'), 120);
                     }
-                    player.health -= Math.max(1, Math.round(baseDmg));
+                    player.health -= Math.round(bdmg);
                 }
             }
-            setTimeout(() => { eEl.classList.remove(atkType); enemy.isAttacking = false; checkMatch(); }, 260);
+            setTimeout(() => { eEl.classList.remove(atkType); enemy.isAttacking = false; checkMatch(); }, 250);
         }
 
         function updateVisuals() {
             document.getElementById('player-fill').style.width = `${Math.max(0, player.health)}%`;
-            const maxHp = levelData[state.currentLevel].health;
-            document.getElementById('enemy-fill').style.width = `${Math.max(0, (enemy.health / maxHp) * 100)}%`;
+            const mHp = levelData[state.currentLevel].health;
+            document.getElementById('enemy-fill').style.width = `${Math.max(0, (enemy.health / mHp) * 100)}%`;
         }
 
         function checkMatch() {
             updateVisuals();
-            if(player.health <= 0) { 
-                playTone(130, 'sawtooth', 0.8, 0.5, 30); 
-                endGame(false, "YOU LOSE"); 
-            } else if(enemy.health <= 0) {
-                const totalLevels = Object.keys(levelData).length;
-                if(state.currentLevel < totalLevels) {
-                    playTone(420, 'sine', 0.3, 0.3, 650);
-                    state.currentLevel++; 
-                    setupLevel(state.currentLevel);
+            if(player.health <= 0) { playTone(150, 'sawtooth', 0.8, 0.5, 40); endGame(false, "YOU LOSE"); }
+            else if(enemy.health <= 0) {
+                if(state.currentLevel < 4) {
+                    playTone(400, 'sine', 0.4, 0.3, 600);
+                    state.currentLevel++; setupLevel(state.currentLevel);
                 } else {
-                    playTone(350, 'sine', 0.2, 0.4, 550); 
-                    setTimeout(() => playTone(550, 'sine', 0.6, 0.4, 950), 150);
+                    playTone(300, 'sine', 0.2, 0.4, 500); setTimeout(() => playTone(500, 'sine', 0.5, 0.4, 900), 150);
                     endGame(true, "CHAMPION VICTORY!");
                 }
             }
         }
 
         function endGame(isWin, msg) {
-            state.gameActive = false; 
-            clearInterval(state.timerInterval); 
-            clearInterval(state.musicInterval);
-            
+            state.gameActive = false; clearInterval(state.timerInterval); clearInterval(state.musicInterval);
             document.getElementById('hud').classList.add('hidden');
             document.getElementById('player').classList.add('hidden');
             document.getElementById('enemy').classList.add('hidden');
-            
             document.getElementById('win-loss-title').innerText = msg;
-            document.getElementById('score-reporting').innerText = `Final Score Score: ${state.score}`;
+            document.getElementById('score-reporting').innerText = `Final Score: ${state.score}`;
             showScreen('gameover-screen');
         }
 
         function showLeaderboardInput() {
-            let initials = prompt("Enter your name tags for leaderboard ranking:", "DOM");
-            if (!initials) initials = "EL DOMO";
-            leaderboard.push({ name: initials.substring(0,12).toUpperCase(), level: state.currentLevel, score: state.score });
+            let initials = prompt("Enter your name:", "PLAYER");
+            if (!initials) initials = "UNKNOWN";
+            leaderboard.push({ name: initials.substring(0,10).toUpperCase(), level: state.currentLevel, score: state.score, diff: state.difficulty.toUpperCase() });
             leaderboard.sort((a,b) => b.score - a.score);
             
-            const tbody = document.getElementById('leaderboard-body'); 
-            tbody.innerHTML = "";
-            leaderboard.forEach((r, i) => {
+            const tbody = document.getElementById('leaderboard-body'); tbody.innerHTML = "";
+            leaderboard.forEach((r,i) => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>#${i+1}</td><td>${r.name}</td><td>Lv ${r.level}</td><td style="color:#ffd700; font-weight:bold;">${r.score}</td>`;
+                tr.innerHTML = `<td>#${i+1}</td><td>${r.name}</td><td>Lv ${r.level}</td><td style="color:#ffd700;">${r.score}</td>`;
                 tbody.appendChild(tr);
             });
             showScreen('leaderboard-screen');
         }
 
         function returnToHome() { showScreen('home-screen'); }
-
-        // --- MOBILE ADAPTIVE FIT TO FRAME SYSTEM ---
-        function fitToFrame() {
-            const wrapper = document.getElementById('game-wrapper');
-            const container = document.getElementById('game-container');
-            const controls = document.getElementById('mobile-controls');
-            
-            const isMobile = window.getComputedStyle(controls).display !== 'none';
-            const availableWidth = window.innerWidth - 20;
-            const targetWidth = 800;
-            
-            if (availableWidth < targetWidth) {
-                const scaleFactor = availableWidth / targetWidth;
-                wrapper.style.transform = `scale(${scaleFactor})`;
-            } else {
-                wrapper.style.transform = `scale(1)`;
-            }
-        }
-
-        window.addEventListener('resize', fitToFrame);
-        window.addEventListener('orientationchange', () => { setTimeout(fitToFrame, 300); });
-        
-        // Final layout verification pass call
-        fitToFrame();
     </script>
 </body>
 </html>
-
-```
