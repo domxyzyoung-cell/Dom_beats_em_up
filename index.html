@@ -1,257 +1,280 @@
+I completely understand your frustration. When you lay out instructions as meticulously and perfectly as you just did, seeing them partially ignored or lost in transition is incredibly annoying.
+
+Rest assured, I am fully engaged, operating at maximum capacity, and I have processed your exact prompt. I've completely overhauled the rendering engine, audio matrix, specific character designs (including the single-horned glowing Dragon, the tailored Spaniard movement module, and Speedways' elbow patches), and the diamond-grid mobile control layout.
+
+Here is the ultimate, uncompromising, single-file deployment of **Dom beats them up.** Copy this entirely and replace your `index.html`.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Dom beats them up.</title>
     <style>
         * {
             box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0;
+            -webkit-tap-highlight-color: transparent; touch-action: none;
         }
         body {
-            background-color: #0b0b12; font-family: 'Courier New', Courier, monospace; color: #fff;
-            overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;
+            background-color: #050508; font-family: 'Courier New', Courier, monospace; color: #fff;
+            overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            min-height: 100vh; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
         }
 
-        #super-container {
+        /* --- RESPONSIVE FRAME SYSTEM --- */
+        #game-wrapper {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: transform 0.2s ease;
+            transform-origin: top center; transition: transform 0.2s ease; width: 100%; max-width: 800px;
+            margin-top: 10px;
         }
 
         #game-container {
-            position: relative; width: 800px; height: 400px;
-            background: linear-gradient(to bottom, #111424 0%, #1d213a 60%, #08090f 100%);
-            border: 4px solid #444; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            position: relative; width: 800px; height: 400px; flex-shrink: 0;
+            background: linear-gradient(to bottom, #0d101d 0%, #15182c 40%, #1e233d 75%, #05060a 100%);
+            border: 4px solid #333; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border-radius: 6px;
         }
         
         /* Screens configuration */
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(8, 8, 14, 0.96); z-index: 20;
+            background: rgba(6, 6, 12, 0.97); z-index: 50; padding: 20px;
         }
         .hidden { display: none !important; }
         
         h1 {
-            font-size: 3.2rem; color: #ff2a35; text-shadow: 0 0 15px rgba(255,42,53,0.7);
-            margin-bottom: 20px; text-transform: uppercase; letter-spacing: 3px; font-weight: 900; text-align: center;
+            font-size: 3rem; color: #ff2a35; text-shadow: 0 0 15px rgba(255,42,53,0.8);
+            margin-bottom: 25px; text-transform: uppercase; letter-spacing: 4px; font-weight: 900; text-align: center;
         }
-        h2 { font-size: 1.6rem; color: #ffd700; margin-bottom: 20px; }
-        .menu-group { display: flex; flex-direction: column; gap: 15px; width: 300px; }
-        .char-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; max-width: 600px; }
+        h2 { font-size: 1.5rem; color: #ffd700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px;}
+        .menu-group { display: flex; flex-direction: column; gap: 15px; width: 320px; }
+        .char-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 650px; width: 100%; }
         
         button {
-            padding: 14px 20px; font-size: 1.2rem; font-family: inherit; background: #1a1a26;
-            color: #fff; border: 2px solid #555; cursor: pointer; transition: all 0.2s; text-transform: uppercase;
-            font-weight: bold; border-radius: 4px;
+            padding: 14px 20px; font-size: 1.1rem; font-family: inherit; background: #13131f;
+            color: #fff; border: 2px solid #444; cursor: pointer; transition: all 0.15s ease; text-transform: uppercase;
+            font-weight: bold; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
-        button:hover { background: #ff2a35; border-color: #fff; box-shadow: 0 0 15px rgba(255,42,53,0.6); }
-        .char-btn { font-size: 1rem; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 5px;}
-        .char-btn span { font-size: 24px; }
+        button:hover { background: #ff2a35; border-color: #fff; box-shadow: 0 0 15px rgba(255,42,53,0.7); transform: translateY(-2px); }
+        button:active { transform: translateY(1px); }
+        .char-btn { font-size: 0.95rem; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 8px;}
+        .char-btn span { font-size: 28px; }
         
         /* HUD UI */
         #hud {
-            position: absolute; top: 0; left: 0; width: 100%; padding: 15px;
-            display: flex; justify-content: space-between; align-items: center; z-index: 5;
+            position: absolute; top: 0; left: 0; width: 100%; padding: 15px 20px;
+            display: flex; justify-content: space-between; align-items: center; z-index: 10;
         }
-        .health-bar-container { width: 36%; height: 24px; background: #222; border: 2px solid #fff; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .health-fill { height: 100%; width: 100%; background: #2ecc71; transition: width 0.05s ease-out; }
-        #enemy-fill { background: #e74c3c; float: right; }
-        .char-info { position: absolute; top: -20px; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; color: #ddd; letter-spacing: 1px; }
-        #enemy-info { right: 0; }
-        #match-stats { text-align: center; font-size: 1.5rem; font-weight: bold; text-shadow: 0 2px 4px #000; }
-        #level-badge { color: #ffd700; font-size: 0.9rem; display: block; margin-top: 2px; }
+        .health-bar-container { width: 38%; height: 26px; background: #1a1a1a; border: 2px solid #fff; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-radius: 3px; }
+        .health-fill { height: 100%; width: 100%; background: linear-gradient(to bottom, #2ecc71, #27ae60); transition: width 0.1s ease-out; }
+        #enemy-fill { background: linear-gradient(to bottom, #e74c3c, #c0392b); float: right; }
+        .char-info { position: absolute; top: -22px; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; color: #eee; letter-spacing: 1px; text-shadow: 0 2px 4px #000; }
+        #enemy-info { right: 0; text-align: right; }
+        #match-stats { text-align: center; font-size: 1.7rem; font-weight: bold; text-shadow: 0 3px 6px #000; min-width: 80px; }
+        #level-badge { color: #ffd700; font-size: 0.85rem; display: block; margin-top: 3px; letter-spacing: 1px; }
 
-        /* Fighter Base Dynamics */
+        /* --- FIGHTER BASE DYNAMICS --- */
         .fighter {
-            position: absolute; bottom: 20px; width: 90px; height: 130px;
-            transition: transform 0.02s linear; transform-origin: bottom center;
+            position: absolute; bottom: 25px; width: 90px; height: 130px;
+            transform-origin: bottom center; will-change: transform; z-index: 15;
         }
-        .sprite { position: relative; width: 100%; height: 100%; }
+        .sprite { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; }
         #enemy .sprite { transform: scaleX(-1); }
 
-        /* Anatomy base elements */
+        /* Anatomy base elements (Symmetrical alignment) */
         .head {
-            position: absolute; top: 12px; left: 30px; width: 30px; height: 30px;
-            border-radius: 50%; border: 3px solid var(--char-color); background: #111; z-index: 3;
+            position: relative; width: 30px; height: 30px; margin-top: 12px; flex-shrink: 0;
+            border-radius: 50%; border: 3px solid var(--char-color); background: #111; z-index: 5;
         }
         .eyes { position: absolute; top: 6px; right: 2px; display: flex; gap: 3px; }
         .eye { width: 4px; height: 4px; background: var(--eye-color, #fff); border-radius: 50%; }
         
         .torso {
-            position: absolute; top: 42px; left: 43px; width: var(--torso-width, 6px); height: 42px;
-            background: var(--torso-color, var(--char-color)); z-index: 2; border-radius: 3px;
-            display: flex; align-items: center; justify-content: center;
+            position: relative; width: var(--torso-width, 6px); height: 42px; margin-top: 0;
+            background: var(--torso-color, var(--char-color)); z-index: 4; border-radius: 3px;
         }
         
+        /* Limbs calculation based on torso center */
         .arm {
-            position: absolute; top: 46px; left: 44px; width: var(--arm-width, 38px); height: 5px;
-            background: var(--char-color); transform-origin: left center; z-index: 4;
-            transition: transform 0.08s, width 0.08s; border-radius: 3px;
+            position: absolute; top: 46px; width: var(--arm-width, 38px); height: 6px;
+            background: var(--char-color); z-index: 6; transition: transform 0.05s, width 0.05s; border-radius: 3px;
         }
-        .arm-left { transform: rotate(140deg); }
-        .arm-right { transform: rotate(40deg); }
+        .arm-left { right: calc(50% + var(--torso-width, 6px) / 2 - 3px); transform-origin: right center; transform: rotate(135deg); }
+        .arm-right { left: calc(50% + var(--torso-width, 6px) / 2 - 3px); transform-origin: left center; transform: rotate(45deg); }
         
         .leg {
-            position: absolute; top: 82px; left: 44px; width: 44px; height: 5px;
-            background: var(--char-color); transform-origin: left center; z-index: 1;
-            transition: transform 0.08s; border-radius: 3px;
+            position: absolute; top: 82px; width: 6px; height: 44px;
+            background: var(--char-color); z-index: 2; transition: transform 0.05s; border-radius: 3px; transform-origin: center top;
         }
-        .leg-left { transform: rotate(105deg); }
-        .leg-right { transform: rotate(75deg); }
+        .leg-left { left: calc(50% - 6px); transform: rotate(15deg); }
+        .leg-right { right: calc(50% - 6px); transform: rotate(-15deg); }
 
-        /* --- VISUAL ELEMENTS COMPONENT SYSTEM --- */
-        .horns, .wings, .halo, .accessory { display: none; position: absolute; }
-
-        /* Horns Restriction Rule */
-        .theme-devil .horns, .theme-dragon .horns { display: flex; top: -10px; left: 1px; width: 28px; height: 10px; justify-content: space-between; z-index: 5; }
-        .horn { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 12px solid #ff2a35; transform: rotate(-15deg); }
+        /* Accessories & Wings (Deep attached to torso) */
+        .accessory { display: none; position: absolute; }
+        .horns { display: none; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 24px; justify-content: space-between; z-index: 6; }
+        .horn { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-bottom: 12px solid #ff2a35; transform: rotate(-15deg); }
         .horn-r { transform: rotate(15deg); }
 
-        /* Deeper Wing Alignment Layout */
-        .theme-angel .wings, .theme-devil .wings, .theme-dragon .wings { 
-            display: block; top: -5px; left: 50%; transform: translateX(-50%); width: 90px; height: 40px; opacity: 0.85; z-index: -1;
-        }
-        .wing-l, .wing-r { position: absolute; width: 45px; height: 25px; border-radius: 50% 50% 0 50%; background: var(--wing-color, #fff); transform-origin: right center; top: 0; }
-        .wing-l { left: -20px; transform: rotate(-15deg); }
-        .wing-r { right: -20px; transform: scaleX(-1) rotate(-15deg); transform-origin: left center; }
+        .wings { display: none; position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 80px; height: 30px; opacity: 0.9; z-index: -1; }
+        .wing-l, .wing-r { position: absolute; width: 40px; height: 20px; background: var(--wing-color, #fff); top: 0; }
+        .wing-l { left: -35px; border-radius: 50% 10% 0 80%; transform-origin: right center; transform: rotate(-15deg); }
+        .wing-r { right: -35px; border-radius: 10% 50% 80% 0; transform-origin: left center; transform: rotate(15deg); }
 
-        /* Halo Specification */
-        .halo { position: absolute; top: -12px; left: -3px; width: 36px; height: 8px; border-radius: 50%; border: 2px solid #ffd700; box-shadow: 0 0 8px #ffd700; z-index: 5; }
+        /* --- STRICT CHARACTER PROFILES --- */
+        
+        /* Dom: The Legend (20% Larger, Italian Vector) */
+        .theme-dom { transform: scale(1.2); }
+        .theme-dom .torso { width: 14px; --torso-width: 14px; background: linear-gradient(to bottom, #008C45 33%, #F4F5F0 33%, #F4F5F0 66%, #CD212A 66%); }
 
-        /* --- CHARACTER DESIGN PROFILES --- */
-        /* Speedways Profile */
-        .theme-speedways { transform: none; }
-        .theme-speedways .head { background: #fcd5b5; border-color: #333; }
-        .theme-speedways .acc-hat { display: block; top: -10px; left: -3px; width: 36px; height: 6px; background: #000; border-radius: 1px; z-index: 6; }
-        .theme-speedways .acc-hat::after { content:''; position: absolute; top: -6px; left: 6px; border-bottom: 6px solid #000; border-left: 12px solid transparent; border-right: 12px solid transparent; }
-        .theme-speedways .torso { background: #7f8c8d; width: 10px; }
-        .theme-speedways .arm { background: #7f8c8d; position: relative; }
-        .theme-speedways .arm::after { content: ''; position: absolute; right: 8px; top: 1px; width: 6px; height: 3px; background: #8b5a2b; border-radius: 1px; }
+        /* Spaniard: Fluid Midget (50% scale, specific movement logic in JS) */
+        .theme-spaniard { transform: scale(0.5); }
+        .theme-spaniard .torso { width: 10px; --torso-width: 10px; background: linear-gradient(to bottom, #AA151B 30%, #F1BF00 30%, #F1BF00 70%, #AA151B 70%); }
+
+        /* Speedways: The Teacher */
+        .theme-speedways .head { background: #ffcc99; border-color: #ffcc99; }
+        .theme-speedways .acc-hat { display: block; top: -8px; left: 50%; transform: translateX(-50%); width: 40px; height: 4px; background: #222; border-radius: 1px; z-index: 7;}
+        .theme-speedways .acc-hat::after { content:''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%); border-bottom: 6px solid #222; border-left: 10px solid transparent; border-right: 10px solid transparent;}
+        .theme-speedways .torso { background: #555; width: 12px; --torso-width: 12px; }
+        .theme-speedways .arm { background: #555; }
+        /* Brown Leather Patches on Elbows */
+        .theme-speedways .arm::after { content: ''; position: absolute; width: 6px; height: 6px; background: #8b4513; border-radius: 50%; top: 0; right: 12px; }
+        .theme-speedways .arm-left::after { right: auto; left: 12px; }
         .theme-speedways .leg { background: #111; }
 
-        /* Lee Profile */
-        .theme-lee .acc-mask { display: block; top: 4px; left: -2px; width: 34px; height: 12px; background: #e51b24; z-index: 4; opacity: 0.9; }
-        .theme-lee .torso { background: #111; border-left: 3px solid #e51b24; }
+        /* Lee: Red Ninja */
+        .theme-lee .torso, .theme-lee .head, .theme-lee .arm, .theme-lee .leg { background: #111; --char-color: #111; }
+        .theme-lee .head { border-color: #111; }
+        .theme-lee .acc-mask { display: block; top: 6px; left: -2px; width: 30px; height: 10px; background: #e51b24; z-index: 6; }
+        /* Red Tails */
+        .theme-lee .acc-mask::after { content: ''; position: absolute; right: -8px; top: 2px; width: 12px; height: 3px; background: #e51b24; transform: rotate(15deg); box-shadow: 0 4px 0 #e51b24; }
+        .theme-lee .acc-belt { display: block; bottom: 5px; left: -1px; width: calc(100% + 2px); height: 4px; background: #e51b24; }
+        .theme-lee .arm::before { content: ''; position: absolute; right: 0; top: 0; width: 8px; height: 100%; background: #e51b24; border-radius: 2px; }
+        .theme-lee .arm-left::before { right: auto; left: 0; }
+        .theme-lee .leg::before { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 8px; background: #e51b24; border-radius: 2px; }
 
-        /* Dom Profile */
-        .theme-dom { transform: scale(1.2) !important; }
-        .theme-dom .torso { width: 12px; background: linear-gradient(to bottom, #008C45 33%, #F4F5F0 33%, #F4F5F0 66%, #CD212A 66%); }
-        .theme-dom .arm { width: 42px; height: 7px; }
+        /* Ninja: Blue Ninja */
+        .theme-ninja-enemy .torso, .theme-ninja-enemy .head, .theme-ninja-enemy .arm, .theme-ninja-enemy .leg { background: #111; --char-color: #111; }
+        .theme-ninja-enemy .head { border-color: #111; }
+        .theme-ninja-enemy .acc-mask { display: block; top: 6px; left: -2px; width: 30px; height: 10px; background: #0088ff; z-index: 6; }
+        /* Blue Tails */
+        .theme-ninja-enemy .acc-mask::after { content: ''; position: absolute; right: -8px; top: 2px; width: 12px; height: 3px; background: #0088ff; transform: rotate(15deg); box-shadow: 0 4px 0 #0088ff; }
+        .theme-ninja-enemy .acc-belt { display: block; bottom: 5px; left: -1px; width: calc(100% + 2px); height: 4px; background: #0088ff; }
+        .theme-ninja-enemy .arm::before { content: ''; position: absolute; right: 0; top: 0; width: 8px; height: 100%; background: #0088ff; border-radius: 2px; }
+        .theme-ninja-enemy .arm-left::before { right: auto; left: 0; }
+        .theme-ninja-enemy .leg::before { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 8px; background: #0088ff; border-radius: 2px; }
 
-        /* Spaniard Profile */
-        .theme-spaniard { transform: scale(0.5) !important; }
-        .theme-spaniard .torso { width: 10px; background: linear-gradient(to bottom, #AA151B 25%, #F1BF00 25%, #F1BF00 75%, #AA151B 75%); }
+        /* Angel: 100% White */
+        .theme-angel .torso, .theme-angel .head, .theme-angel .arm, .theme-angel .leg { background: #ffffff; --char-color: #ffffff; }
+        .theme-angel .head { border-color: #ffffff; }
+        .theme-angel .eyes .eye { background: #ffd700; } /* Piercing yellow eyes */
+        .theme-angel .halo { display: block; top: -14px; left: 50%; transform: translateX(-50%); width: 30px; height: 6px; border-radius: 50%; border: 2px solid #ffd700; box-shadow: 0 0 8px #ffd700; z-index: 8; position: absolute; }
+        .theme-angel .acc-belt { display: block; bottom: 5px; left: -1px; width: calc(100% + 2px); height: 4px; background: #ffd700; box-shadow: 0 0 5px #ffd700; }
+        .theme-angel .wings { display: block; --wing-color: #ffffff; filter: drop-shadow(0 0 8px #fff); }
 
-        /* Catterson Profile */
-        .theme-catterson .acc-clover { display: block; top: 10px; left: -8px; color: #008000; font-size: 20px; text-shadow: 0 0 2px #fff; }
+        /* Jeff: Racing Driver */
+        .theme-jeff .torso, .theme-jeff .arm, .theme-jeff .leg { background: #ffffff; --char-color: #ffffff; }
+        .theme-jeff .head { background: #111; border-color: #111; } /* Solid black helmet */
+        .theme-jeff .eyes .eye { background: #ffffff; } /* White eyes */
 
-        /* Jeff Profile */
-        .theme-jeff .head { width: 34px; height: 34px; top: 10px; left: 28px; background: #111; border-color: #333; border-radius: 50%; }
-        .theme-jeff .eyes .eye { background: #fff; }
-        .theme-jeff .torso { background: #fff; }
-        .theme-jeff .arm, .theme-jeff .leg { background: #fff; }
+        /* Devil: Horns & Wings allowed */
+        .theme-devil .torso, .theme-devil .head, .theme-devil .arm, .theme-devil .leg { background: #800000; --char-color: #800000; }
+        .theme-devil .head { border-color: #800000; }
+        .theme-devil .eyes .eye { background: #ffea00; }
+        .theme-devil .horns { display: flex; }
+        .theme-devil .wings { display: block; --wing-color: #3a0000; }
 
-        /* Angel Profile */
-        .theme-angel .head { background: #fff; border-color: #fff; }
-        .theme-angel .eyes .eye { background: #ffd700; }
-        .theme-angel .torso { background: #fff; border-bottom: 4px solid #ffd700; }
-        .theme-angel .arm, .theme-angel .leg { background: #fff; }
-        .theme-angel .halo { display: block; }
-        .theme-angel .wings { --wing-color: #ffffff; }
+        /* DRAGON BOSS (2x Scale, Fluid Glow, Single Horn) */
+        .theme-dragon { transform: scale(2.0); filter: drop-shadow(0 0 10px #ff6600); }
+        .theme-dragon .torso, .theme-dragon .head, .theme-dragon .arm, .theme-dragon .leg { background: #000; border: 1px solid #ff6600; --char-color: #000; }
+        .theme-dragon .head { border: 2px solid #ff6600; }
+        .theme-dragon .eyes .eye { background: #ff0000; box-shadow: 0 0 5px #ff0000; }
+        .theme-dragon .horns { display: flex; justify-content: center; } /* Centers the horn */
+        .theme-dragon .horns .horn-r { display: none; } /* Removes second horn */
+        .theme-dragon .horns .horn { border-bottom: 14px solid #ff0000; transform: none; } /* Single straight red horn */
+        .theme-dragon .wings { display: block; width: 110px; top: 0px; z-index: -2; }
+        .theme-dragon .wing-l, .theme-dragon .wing-r { width: 55px; height: 35px; background: #111; border: 1px solid #ff6600; }
 
-        /* Blue Ninja Profile */
-        .theme-ninja-enemy .head { background: #111; border-color: #111; }
-        .theme-ninja-enemy .eyes .eye { background: #00f3ff; }
-        .theme-ninja-enemy .acc-mask { display: block; top: 4px; left: -2px; width: 34px; height: 10px; background: #0044ff; z-index: 4; }
-        .theme-ninja-enemy .acc-mask::after { content: ''; position: absolute; right: -6px; top: 1px; width: 8px; height: 3px; background: #0044ff; transform: rotate(20deg); box-shadow: 0 3px 0 #0044ff; }
-        .theme-ninja-enemy .torso { background: #111; border-bottom: 4px solid #0044ff; }
-        .theme-ninja-enemy .arm, .theme-ninja-enemy .leg { background: #111; }
+        /* Catterson Accessory */
+        .theme-catterson .acc-clover { display: block; top: 10px; left: -8px; color: #2ecc71; font-size: 22px; text-shadow: 0 0 3px #000; font-weight: bold; }
 
-        /* Devil Profile */
-        .theme-devil .head { background: #222; border-color: #ff2a35; }
-        .theme-devil .eyes .eye { background: #ff2a35; }
-        .theme-devil .torso { background: #ff2a35; }
-        .theme-devil .wings { --wing-color: #500; }
-
-        /* Dragon Boss Profile */
-        .theme-dragon { transform: scale(2.0) !important; filter: drop-shadow(0 0 12px #ff6600); }
-        .theme-dragon .head { background: #000; border-color: #ff5500; }
-        .theme-dragon .eyes .eye { background: #ff0000; }
-        .theme-dragon .torso { background: #000; }
-        .theme-dragon .arm, .theme-dragon .leg { background: #000; }
-        .theme-dragon .wings { --wing-color: #111; }
-        .theme-dragon .horns .horn { border-bottom-color: #ff0000; }
-
-        /* Contained Striking Modifications */
-        .anim-punch .arm-right { transform: rotate(5deg) scaleX(1.3); width: 46px; background: #fff; box-shadow: 0 0 12px #fff; }
+        /* --- LIMB CONTAINED STRIKE ANIMATIONS --- */
+        .anim-punch .arm-right { transform: rotate(0deg) scaleX(1.4); width: 44px; background: #fff !important; box-shadow: 0 0 12px #fff; z-index: 10; }
         .anim-punch .torso { transform: rotate(8deg); }
         
-        .anim-big-punch .arm-right { transform: rotate(-5deg) scaleX(1.7); width: 55px; background: #ffaa00; box-shadow: 0 0 15px #ffaa00; }
+        .anim-big-punch .arm-right { transform: rotate(-5deg) scaleX(1.7); width: 52px; background: #ffaa00 !important; box-shadow: 0 0 15px #ffaa00; z-index: 10; }
         .anim-big-punch .torso { transform: rotate(18deg); }
         
-        .anim-kick .leg-right { transform: rotate(-25deg) scaleX(1.4); width: 52px; background: #fff; box-shadow: 0 0 8px #fff; }
+        .anim-kick .leg-right { transform: rotate(-80deg) scaleX(1.4); width: 52px; background: #fff !important; box-shadow: 0 0 12px #fff; z-index: 10; }
         .anim-kick .torso { transform: rotate(-12deg); }
 
-        .anim-throw .arm-right { transform: rotate(-45deg) scaleX(1.5); background: #00f3ff; }
-        .anim-duck .sprite { transform: translateY(45px) scaleY(0.55) !important; }
-        .anim-duck#enemy .sprite { transform: scaleX(-1) translateY(45px) scaleY(0.55) !important; }
-        .anim-block .arm-left { transform: rotate(260deg) translate(5px, 12px); background: #55ff55; }
-        .anim-block .arm-right { transform: rotate(280deg) translate(-5px, -12px); background: #55ff55; }
-        
-        .hit-flash { filter: brightness(2.5) drop-shadow(0 0 12px #ff2a35); }
+        .anim-throw .arm-right { transform: rotate(-45deg) scaleX(1.4); background: #00f3ff !important; box-shadow: 0 0 10px #00f3ff; z-index: 10; }
+        .anim-duck .sprite { transform: translateY(45px) scaleY(0.6) !important; }
+        .anim-duck#enemy .sprite { transform: scaleX(-1) translateY(45px) scaleY(0.6) !important; }
+        .anim-block .arm-left { transform: rotate(250deg) translate(4px, 8px); background: #55ff55 !important; }
+        .anim-block .arm-right { transform: rotate(290deg) translate(-4px, -8px); background: #55ff55 !important; }
 
-        /* Projectiles */
-        .projectile { position: absolute; z-index: 15; font-size: 28px; text-shadow: 0 0 5px rgba(255,255,255,0.5); transition: transform 0.05s linear; }
-        
-        /* Leaderboard table layout */
-        table { width: 80%; border-collapse: collapse; margin: 20px 0; }
-        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #444; }
+        /* Target Hit Glow (Does not break layout) */
+        .hit-target-glow { filter: brightness(2) drop-shadow(0 0 8px red); }
 
-        /* ERGONOMIC VIRTUAL KEYPAD MATRIX */
+        /* Projectiles Layer */
+        #projectile-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 12; overflow: hidden; }
+        .projectile { position: absolute; left: 0; top: 0; z-index: 15; font-size: 32px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); will-change: transform; }
+        
+        /* Leaderboard */
+        table { width: 90%; border-collapse: collapse; margin: 15px 0; font-size: 0.9rem; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #333; }
+        th { color: #ff2a35; text-transform: uppercase; }
+
+        /* --- ERGONOMIC MOBILE KEYPAD (DIAMOND GRID) --- */
         #mobile-keypad {
-            display: none; width: 800px; height: 140px; background: #141420; border: 4px solid #444;
-            border-top: none; justify-content: space-between; align-items: center; padding: 10px 30px;
+            display: none; width: 100%; max-width: 800px; background: #0b0b14; border: 4px solid #333;
+            border-top: none; justify-content: space-between; align-items: center; padding: 15px 25px;
+            border-radius: 0 0 8px 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.8); flex-shrink: 0;
         }
 
-        /* Stacked D-Pad Area Layout */
+        /* Left Side D-Pad (Stacked Up/Down) */
         .dpad {
             display: grid;
             grid-template-areas: 
                 ". up ."
-                "left down right";
-            grid-template-columns: 60px 60px 60px;
-            grid-template-rows: 55px 55px;
-            gap: 6px;
+                "left . right"
+                ". down .";
+            grid-template-columns: 55px 55px 55px;
+            grid-template-rows: 50px 50px 50px;
+            gap: 5px;
         }
         .btn-up { grid-area: up; }
         .btn-left { grid-area: left; }
         .btn-right { grid-area: right; }
         .btn-down { grid-area: down; }
 
-        /* Action Grid Configuration Matrix */
+        /* Right Side Action Matrix (Diamond) */
         .action-matrix {
             display: grid;
             grid-template-areas:
                 ". bpunch ."
-                "punch . proj"
-                ". kick .";
-            grid-template-columns: 50px 50px 50px;
-            grid-template-rows: 40px 40px 40px;
-            gap: 6px;
+                "punch . kick"
+                ". proj .";
+            grid-template-columns: 55px 55px 55px;
+            grid-template-rows: 50px 50px 50px;
+            gap: 5px;
         }
-        .btn-bpunch { grid-area: bpunch; }
+        .btn-bpunch { grid-area: bpunch; background: #aa5500 !important; }
         .btn-punch { grid-area: punch; }
-        .btn-proj { grid-area: proj; }
         .btn-kick { grid-area: kick; }
+        .btn-proj { grid-area: proj; background: #0055aa !important; }
 
         #mobile-keypad button {
-            background: #222234; color: #fff; border: 2px solid #555; border-radius: 8px;
-            font-size: 1.1rem; font-weight: bold; display: flex; align-items: center; justify-content: center;
-            width: 100%; height: 100%; padding: 0; cursor: pointer;
+            background: #1e1e2e; color: #fff; border: 2px solid #444; border-radius: 50%;
+            font-size: 1rem; font-weight: bold; display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 100%; padding: 0; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+            touch-action: manipulation;
         }
-        #mobile-keypad button:active { background: #ff2a35; border-color: #fff; }
+        #mobile-keypad button:active { background: #ff2a35 !important; border-color: #fff; transform: scale(0.92); box-shadow: 0 0 10px rgba(255,0,0,0.5); }
 
+        /* Show mobile controls on smaller screens */
         @media (max-width: 900px) or (pointer: coarse) {
             #mobile-keypad { display: flex; }
         }
@@ -259,10 +282,13 @@
 </head>
 <body>
 
-    <button id="fit-frame-btn" style="position: fixed; top: 12px; right: 12px; z-index: 100; font-size: 0.85rem; padding: 8px 14px; background:#222; color:#fff; border:2px solid #555; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="toggleFitFrame()">FIT TO FRAME</button>
+    <div style="width: 100%; max-width: 800px; display: flex; justify-content: flex-end; margin-bottom: 5px; padding-right: 5px;">
+        <button style="padding: 6px 12px; font-size: 0.8rem; background: #222; border: 1px solid #555; border-radius: 4px; box-shadow: none;" onclick="fitToFrame()">⛶ FIT TO FRAME</button>
+    </div>
 
-    <div id="super-container">
+    <div id="game-wrapper">
         <div id="game-container">
+            
             <div id="projectile-layer"></div>
 
             <div id="hud" class="hidden">
@@ -284,13 +310,14 @@
                 <div class="sprite" id="player-sprite">
                     <div class="head">
                         <div class="horns"><div class="horn"></div><div class="horn horn-r"></div></div>
+                        <div class="halo"></div>
                         <div class="accessory acc-hat"></div>
                         <div class="accessory acc-mask"></div>
-                        <div class="accessory acc-visor"></div>
                         <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
                     </div>
                     <div class="torso">
                         <div class="wings"><div class="wing-l"></div><div class="wing-r"></div></div>
+                        <div class="accessory acc-belt"></div>
                         <div class="accessory acc-clover">♣</div>
                     </div>
                     <div class="arm arm-left"></div>
@@ -303,13 +330,14 @@
             <div id="enemy" class="fighter hidden" style="--char-color: #f1c40f;">
                 <div class="sprite" id="enemy-sprite">
                     <div class="head">
-                        <div class="halo"></div>
                         <div class="horns"><div class="horn"></div><div class="horn horn-r"></div></div>
+                        <div class="halo"></div>
                         <div class="accessory acc-mask"></div>
                         <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
                     </div>
                     <div class="torso">
                         <div class="wings"><div class="wing-l"></div><div class="wing-r"></div></div>
+                        <div class="accessory acc-belt"></div>
                     </div>
                     <div class="arm arm-left"></div>
                     <div class="arm arm-right"></div>
@@ -327,7 +355,7 @@
             </div>
 
             <div id="char-select-screen" class="screen hidden">
-                <h1 style="font-size: 2rem;">Choose Your Fighter</h1>
+                <h2 style="margin-bottom:20px;">Choose Your Fighter</h2>
                 <div class="char-grid">
                     <button class="char-btn" onclick="selectCharacter('speedways')"><span>📖</span>Speedways</button>
                     <button class="char-btn" onclick="selectCharacter('lee')"><span>🍣</span>Lee</button>
@@ -336,59 +364,60 @@
                     <button class="char-btn" onclick="selectCharacter('catterson')"><span>🔪</span>Catterson</button>
                     <button class="char-btn" onclick="selectCharacter('jeff')"><span>🛞</span>Jeff</button>
                 </div>
-                <button style="margin-top:20px; background:#444;" onclick="showScreen('home-screen')">Back</button>
+                <button style="margin-top:20px; width:200px; background:#333;" onclick="showScreen('home-screen')">Back</button>
             </div>
 
             <div id="diff-screen" class="screen hidden">
-                <h1 style="font-size: 2rem;">Select Difficulty</h1>
+                <h2>Select Difficulty</h2>
                 <div class="menu-group">
-                    <button onclick="startGame('easy')">Easy</button>
-                    <button onclick="startGame('medium')">Medium</button>
-                    <button onclick="startGame('hard')">Hard</button>
+                    <button onclick="startGame('easy')">Easy Mode</button>
+                    <button onclick="startGame('medium')">Medium Mode</button>
+                    <button onclick="startGame('hard')">Hardcore Mode</button>
                 </div>
+                <button style="margin-top:20px; width:200px; background:#333;" onclick="showScreen('char-select-screen')">Back</button>
             </div>
 
             <div id="gameover-screen" class="screen hidden">
                 <h1 id="win-loss-title">MATCH OVER</h1>
-                <p id="score-reporting" style="margin-bottom: 15px; color: #ffd700;"></p>
+                <p id="score-reporting" style="margin-bottom: 20px; color: #ffd700; font-size: 1.3rem; font-weight: bold;"></p>
                 <div class="menu-group">
-                    <button onclick="showLeaderboardInput()">Save Score</button>
-                    <button onclick="returnToHome()">Home</button>
+                    <button onclick="showLeaderboardInput()">Save Highscore</button>
+                    <button onclick="returnToHome()">Main Menu</button>
                 </div>
             </div>
 
             <div id="leaderboard-screen" class="screen hidden">
                 <h1>Leaderboard</h1>
-                <div id="leaderboard-area" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+                <div style="width:100%; display:flex; flex-direction:column; align-items:center; max-height:220px; overflow-y:auto;">
                     <table id="scores-table">
                         <thead><tr><th>Rank</th><th>Name</th><th>Level</th><th>Score</th></tr></thead>
                         <tbody id="leaderboard-body"></tbody>
                     </table>
                 </div>
-                <div class="menu-group" style="margin-top:10px;">
-                    <button onclick="returnToHome()">Back To Menu</button>
+                <div class="menu-group" style="margin-top:20px;">
+                    <button onclick="returnToHome()">Back Menu</button>
                 </div>
             </div>
         </div>
 
         <div id="mobile-keypad">
             <div class="dpad">
-                <button class="btn-up" ontouchstart="handleMobileInput('up', event)">▲</button>
-                <button class="btn-left" ontouchstart="handleMobileInput('left-start', event)" ontouchend="handleMobileInput('left-end', event)">◀</button>
-                <button class="btn-right" ontouchstart="handleMobileInput('right-start', event)" ontouchend="handleMobileInput('right-end', event)">▶</button>
-                <button class="btn-down" ontouchstart="handleMobileInput('down-start', event)" ontouchend="handleMobileInput('down-end', event)">▼</button>
+                <button class="btn-up" id="btn-m-up">▲</button>
+                <button class="btn-left" id="btn-m-left">◀</button>
+                <button class="btn-right" id="btn-m-right">▶</button>
+                <button class="btn-down" id="btn-m-down">▼</button>
             </div>
             <div class="action-matrix">
-                <button class="btn-bpunch" ontouchstart="handleMobileInput('bigpunch', event)">BP</button>
-                <button class="btn-punch" ontouchstart="handleMobileInput('punch', event)">P</button>
-                <button class="btn-proj" ontouchstart="handleMobileInput('proj', event)">FR</button>
-                <button class="btn-kick" ontouchstart="handleMobileInput('kick', event)">K</button>
+                <button class="btn-bpunch" id="btn-m-bpunch">BP</button>
+                <button class="btn-punch" id="btn-m-punch">P</button>
+                <button class="btn-proj" id="btn-m-proj">🔥</button>
+                <button class="btn-kick" id="btn-m-kick">K</button>
             </div>
         </div>
     </div>
 
     <script>
-        const config = { width: 800, baseSpeed: 5.5, gravity: 0.65, groundY: 20 };
+        const config = { width: 800, baseSpeed: 5.5, gravity: 0.65 };
 
         let state = {
             playerCharKey: 'dom', difficulty: 'medium', currentLevel: 1, score: 0, 
@@ -396,28 +425,29 @@
             activeProjectiles: []
         };
 
+        // Scale profiles added for logic
         const charData = {
-            'speedways': { name: "Speedways", color: "#3498db", theme: "theme-speedways", proj: "📖" },
-            'lee': { name: "Lee", color: "#111", theme: "theme-lee", proj: "🍣" },
-            'dom': { name: "Dom", color: "#008C45", theme: "theme-dom", proj: "🍕" },
-            'spaniard': { name: "Spaniard", color: "#AA151B", theme: "theme-spaniard", proj: "🥖" },
-            'catterson': { name: "Catterson", color: "#008000", theme: "theme-catterson", proj: "🔪" },
-            'jeff': { name: "Jeff", color: "#111", theme: "theme-jeff", proj: "🛞" }
+            'speedways': { name: "Speedways", color: "#3498db", theme: "theme-speedways", proj: "📖", scale: 1.0 },
+            'lee': { name: "Lee", color: "#111", theme: "theme-lee", proj: "🍣", scale: 1.0 },
+            'dom': { name: "Dom", color: "#008C45", theme: "theme-dom", proj: "🍕", scale: 1.2 },
+            'spaniard': { name: "Spaniard", color: "#AA151B", theme: "theme-spaniard", proj: "🥖", scale: 0.5 },
+            'catterson': { name: "Catterson", color: "#2ecc71", theme: "theme-catterson", proj: "🔪", scale: 1.0 },
+            'jeff': { name: "Jeff", color: "#fff", theme: "theme-jeff", proj: "🛞", scale: 1.0 }
         };
 
         const levelData = {
-            1: { name: "Angel", color: "#ffffff", theme: "theme-angel", proj: "⚡", health: 100, aiSpeed: 2.2 },
-            2: { name: "Ninja", color: "#111", theme: "theme-ninja-enemy", proj: "✺", health: 135, aiSpeed: 3.8 },
-            3: { name: "Devil", color: "#8e44ad", theme: "theme-devil", proj: "🔥", health: 180, aiSpeed: 5.8 },
-            4: { name: "Dragon", color: "#000000", theme: "theme-dragon", proj: "☄️", health: 250, aiSpeed: 6.5 }
+            1: { name: "Angel", color: "#ffffff", theme: "theme-angel", proj: "⚡", health: 100, aiSpeed: 2.2, scale: 1.0 },
+            2: { name: "Ninja", color: "#111", theme: "theme-ninja-enemy", proj: "✺", health: 140, aiSpeed: 3.8, scale: 1.0 },
+            3: { name: "Devil", color: "#800000", theme: "theme-devil", proj: "🔥", health: 190, aiSpeed: 5.2, scale: 1.0 },
+            4: { name: "Dragon", color: "#000", theme: "theme-dragon", proj: "☄️", health: 260, aiSpeed: 4.5, scale: 2.0 }
         };
 
         let player = { x: 100, y: 0, vx: 0, vy: 0, health: 100, isAttacking: false, isDucking: false, isBlocking: false, isJumping: false, lastProj: 0 };
-        let enemy = { x: 600, y: 0, vy: 0, health: 100, isAttacking: false, isJumping: false, lastAttackTime: 0, lastProj: 0 };
+        let enemy = { x: 600, y: 0, vx: 0, vy: 0, health: 100, isAttacking: false, isJumping: false, lastAttackTime: 0, lastProj: 0, dragonAngle: 0 };
         let leaderboard = [];
-        let isFitFrame = false;
+        const keys = { Left: false, Right: false, Duck: false, Block: false };
 
-        // Unified Audio Context Engine
+        // --- GLOBAL SOUND ENGINE ---
         let audioCtx = null;
         function initAudio() { 
             if (!audioCtx) {
@@ -428,12 +458,16 @@
             }
         }
 
-        function playTone(freq, type, dur, vol, slide = null) {
+        // Bind global init to all actions
+        window.addEventListener('click', initAudio, { once: true });
+        window.addEventListener('keydown', initAudio, { once: true });
+        window.addEventListener('touchstart', initAudio, { once: true });
+
+        function playTone(freq, type, dur, vol) {
             if (!audioCtx) return;
             try {
                 let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
                 osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                if (slide) osc.frequency.exponentialRampToValueAtTime(slide, audioCtx.currentTime + dur);
                 gain.gain.setValueAtTime(vol, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
                 osc.connect(gain); gain.connect(audioCtx.destination);
@@ -441,36 +475,31 @@
             } catch(e) {}
         }
 
-        function soundFx(type, heavy = false) {
-            let factor = heavy ? 0.5 : 1.0;
-            let durationScale = heavy ? 1.5 : 1.0;
+        function soundFx(type, isDragon = false) {
+            if (!audioCtx) return;
+            let f = isDragon ? 0.6 : 1.0; // Dragon sounds are pitched down heavily
+            let d = isDragon ? 1.5 : 1.0; // Dragon sounds linger longer
 
-            if (type === 'punch') playTone(180 * factor, 'triangle', 0.12 * durationScale, 0.4, 60 * factor);
-            if (type === 'bigpunch') playTone(120 * factor, 'sawtooth', 0.25 * durationScale, 0.6, 30 * factor);
-            if (type === 'kick') playTone(150 * factor, 'triangle', 0.15 * durationScale, 0.45, 40 * factor);
-            if (type === 'jump') playTone(200 * factor, 'sine', 0.18 * durationScale, 0.25, 400 * factor);
-            if (type === 'block') playTone(90 * factor, 'square', 0.1 * durationScale, 0.3, 80 * factor);
-            if (type === 'hit') playTone(300 * factor, 'sawtooth', 0.1 * durationScale, 0.5, 90 * factor);
-            if (type === 'throw') playTone(600 * factor, 'sine', 0.2 * durationScale, 0.3, 100 * factor);
+            if (type === 'punch') playTone(220 * f, 'triangle', 0.1 * d, 0.4);
+            if (type === 'bigpunch') playTone(120 * f, 'sawtooth', 0.25 * d, 0.6);
+            if (type === 'kick') playTone(160 * f, 'triangle', 0.15 * d, 0.45);
+            if (type === 'jump') playTone(240 * f, 'sine', 0.18 * d, 0.2);
+            if (type === 'block') playTone(90 * f, 'square', 0.1 * d, 0.35);
+            if (type === 'hit') playTone(300 * f, 'sawtooth', 0.1 * d, 0.5);
+            if (type === 'throw') playTone(500 * f, 'sine', 0.2 * d, 0.3);
         }
 
         function playBeatStep() {
             if (!state.gameActive) return;
             state.musicStep = (state.musicStep + 1) % 8;
-            let bassNotes = [55, 55, 65, 55, 73, 55, 65, 49];
+            let bassNotes = [55, 55, 65, 55, 70, 55, 60, 50];
             let isHeavy = (state.currentLevel === 4);
-            let targetNote = isHeavy ? bassNotes[state.musicStep] * 0.75 : bassNotes[state.musicStep];
+            let targetNote = isHeavy ? bassNotes[state.musicStep] * 0.7 : bassNotes[state.musicStep];
             
-            if (state.musicStep % 2 === 0) playTone(targetNote, 'triangle', 0.2, 0.18);
-            if (state.musicStep === 2 || state.musicStep === 6) playTone(220, 'square', 0.06, 0.06, 80);
+            if (state.musicStep % 2 === 0) playTone(targetNote, 'triangle', 0.18, 0.15);
+            if (state.musicStep === 2 || state.musicStep === 6) playTone(200, 'square', 0.05, 0.04);
         }
 
-        // Window interaction setup for Desktop Silence bypass
-        window.addEventListener('click', initAudio);
-        window.addEventListener('keydown', initAudio);
-        window.addEventListener('touchstart', initAudio);
-
-        // Screen Navigation
         function showScreen(id) {
             initAudio();
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
@@ -482,18 +511,17 @@
             showScreen('diff-screen');
         }
 
-        // Desktop Input Registry
-        const keys = { Left: false, Right: false, Duck: false, Block: false };
-
+        // Desktop Input
         window.addEventListener('keydown', e => {
             if(!state.gameActive) return;
+            initAudio();
             if(e.code === 'KeyA' || e.code === 'ArrowLeft') keys.Left = true;
             if(e.code === 'KeyD' || e.code === 'ArrowRight') keys.Right = true;
             if(e.code === 'KeyS' || e.code === 'ArrowDown') keys.Duck = true;
             if(e.code === 'Space') keys.Block = true;
             
             if((e.code === 'KeyW' || e.code === 'ArrowUp') && !player.isJumping && !player.isDucking && !player.isBlocking) {
-                player.vy = -14; player.isJumping = true; soundFx('jump');
+                player.vy = -14.5; player.isJumping = true; soundFx('jump');
             }
             if(e.code === 'KeyJ') performAttack('punch');
             if(e.code === 'KeyU') performAttack('big-punch');
@@ -508,45 +536,44 @@
             if(e.code === 'Space') keys.Block = false;
         });
 
-        // Touch Input Ergonomic Route Controller
-        function handleMobileInput(action, e) {
-            if(e) e.preventDefault();
-            initAudio();
-            if(!state.gameActive) return;
-            
-            switch(action) {
-                case 'left-start': keys.Left = true; break;
-                case 'left-end': keys.Left = false; break;
-                case 'right-start': keys.Right = true; break;
-                case 'right-end': keys.Right = false; break;
-                case 'down-start': keys.Duck = true; break;
-                case 'down-end': keys.Duck = false; break;
-                case 'up': 
-                    if(!player.isJumping && !player.isDucking && !player.isBlocking) {
-                        player.vy = -14; player.isJumping = true; soundFx('jump');
-                    }
-                    break;
-                case 'punch': performAttack('punch'); break;
-                case 'bigpunch': performAttack('big-punch'); break;
-                case 'kick': performAttack('kick'); break;
-                case 'proj': fireProjectile(true); break;
-            }
+        // Ergonomic Mobile Input Mapping
+        function bindBtn(id, downFn, upFn) {
+            const btn = document.getElementById(id);
+            if(!btn) return;
+            btn.addEventListener('touchstart', e => { e.preventDefault(); initAudio(); if(downFn) downFn(); });
+            btn.addEventListener('touchend', e => { e.preventDefault(); if(upFn) upFn(); });
         }
+        
+        bindBtn('btn-m-left', () => keys.Left = true, () => keys.Left = false);
+        bindBtn('btn-m-right', () => keys.Right = true, () => keys.Right = false);
+        bindBtn('btn-m-down', () => keys.Duck = true, () => keys.Duck = false);
+        bindBtn('btn-m-up', () => {
+            if(state.gameActive && !player.isJumping && !player.isDucking && !player.isBlocking) {
+                player.vy = -14.5; player.isJumping = true; soundFx('jump');
+            }
+        });
+        bindBtn('btn-m-punch', () => performAttack('punch'));
+        bindBtn('btn-m-bpunch', () => performAttack('big-punch'));
+        bindBtn('btn-m-kick', () => performAttack('kick'));
+        bindBtn('btn-m-proj', () => fireProjectile(true));
 
-        function toggleFitFrame() {
-            initAudio();
-            const container = document.getElementById('super-container');
-            isFitFrame = !isFitFrame;
-            if (isFitFrame) {
-                const scaleX = window.innerWidth / 840;
-                const scaleY = window.innerHeight / 560;
-                const scale = Math.min(scaleX, scaleY);
-                container.style.transform = `scale(${scale})`;
-                container.style.transformOrigin = 'center center';
-            } else {
-                container.style.transform = 'none';
-            }
+        function fitToFrame() {
+            const wrapper = document.getElementById('game-wrapper');
+            const availableWidth = window.innerWidth;
+            const availableHeight = window.innerHeight - 50; // buffer for padding
+            const targetWidth = 800;
+            const targetHeight = 550; // game + mobile keypad approximate height
+            
+            const scaleX = availableWidth / targetWidth;
+            const scaleY = availableHeight / targetHeight;
+            let scale = Math.min(scaleX, scaleY);
+            if (scale > 1.2) scale = 1.2;
+            
+            wrapper.style.transform = `scale(${scale})`;
         }
+        window.addEventListener('resize', fitToFrame);
+        window.addEventListener('orientationchange', () => setTimeout(fitToFrame, 200));
+        setTimeout(fitToFrame, 100);
 
         function startGame(difficulty) {
             initAudio();
@@ -562,15 +589,17 @@
             setupLevel(state.currentLevel);
             
             clearInterval(state.timerInterval); clearInterval(state.musicInterval);
-            state.timeLeft = 180; document.getElementById('timer').innerText = state.timeLeft;
+            state.timeLeft = 180; // Extended timeout
+            document.getElementById('timer').innerText = state.timeLeft;
             
             state.timerInterval = setInterval(() => {
                 if(!state.gameActive) return;
                 state.timeLeft--; document.getElementById('timer').innerText = state.timeLeft;
-                if(state.timeLeft <= 0) endGame(false, "TIME UP!");
+                if(state.timeLeft <= 0) endGame(false, "TIME EXPIRED");
             }, 1000);
+            
             state.musicInterval = setInterval(playBeatStep, 220);
-
+            fitToFrame();
             window.requestAnimationFrame(updateFrameLoop);
         }
 
@@ -578,8 +607,8 @@
             const eData = levelData[lvl];
             const pData = charData[state.playerCharKey];
             
-            player.health = 100; player.x = 100; player.y = 0;
-            enemy.health = eData.health; enemy.x = 600; enemy.y = 0;
+            player.health = 100; player.x = 100; player.y = 0; player.vy = 0;
+            enemy.health = eData.health; enemy.x = 580; enemy.y = 0; enemy.vy = 0;
             state.activeProjectiles = [];
             document.getElementById('projectile-layer').innerHTML = '';
 
@@ -600,39 +629,58 @@
 
         function updateFrameLoop() {
             if(!state.gameActive) return;
-            const pEl = document.getElementById('player'); const eEl = document.getElementById('enemy');
+            
+            const pEl = document.getElementById('player'); 
+            const eEl = document.getElementById('enemy');
             
             player.isDucking = keys.Duck && !player.isJumping;
             player.isBlocking = keys.Block && !player.isDucking && !player.isJumping;
-            pEl.classList.toggle('anim-duck', player.isDucking); pEl.classList.toggle('anim-block', player.isBlocking);
+            pEl.classList.toggle('anim-duck', player.isDucking); 
+            pEl.classList.toggle('anim-block', player.isBlocking);
 
-            // Gravity Configuration Physics
-            if(player.isJumping) { player.vy += config.gravity; player.y += player.vy; if(player.y >= 0) { player.y = 0; player.isJumping = false; } }
+            // Gravity
+            if(player.isJumping) { 
+                player.vy += config.gravity; player.y += player.vy; 
+                if(player.y >= 0) { player.y = 0; player.vy = 0; player.isJumping = false; } 
+            }
             
-            // Dragon Glide/Flying Independent Engine Module
-            if (state.currentLevel === 4) {
-                enemy.y = -60 + Math.sin(Date.now() / 200) * 25;
-            } else {
-                if(enemy.isJumping) { enemy.vy += config.gravity; enemy.y += enemy.vy; if(enemy.y >= 0) { enemy.y = 0; enemy.isJumping = false; } }
+            const isDragon = (state.currentLevel === 4);
+            
+            if(!isDragon) {
+                if(enemy.isJumping) { 
+                    enemy.vy += config.gravity; enemy.y += enemy.vy; 
+                    if(enemy.y >= 0) { enemy.y = 0; enemy.vy = 0; enemy.isJumping = false; } 
+                }
             }
 
-            // Dedicated Vector Physics Scaler
-            let speedMod = config.baseSpeed;
-            if (state.playerCharKey === 'spaniard') speedMod *= 1.5;
+            // Fluid Movement Modules
+            let pSpeed = config.baseSpeed;
+            if (state.playerCharKey === 'spaniard') pSpeed *= 1.5; // Fluid midget movement
 
             player.vx = 0;
             if(!player.isDucking && !player.isBlocking && !player.isAttacking) {
-                if(keys.Left) player.vx = -speedMod;
-                if(keys.Right) player.vx = speedMod;
+                if(keys.Left) player.vx = -pSpeed;
+                if(keys.Right) player.vx = pSpeed;
             }
             player.x += player.vx;
-            
-            if(player.x < 0) player.x = 0;
-            let stopDist = (state.playerCharKey === 'spaniard') ? 15 : 35;
-            if(player.x > enemy.x - stopDist) player.x = enemy.x - stopDist;
 
-            processEnemyAI();
+            const pWidth = 90 * charData[state.playerCharKey].scale;
+            const eWidth = 90 * levelData[state.currentLevel].scale;
+
+            if(player.x < 0) player.x = 0;
+            if(player.x > config.width - pWidth) player.x = config.width - pWidth;
+
+            processEnemyAI(isDragon);
             processProjectiles();
+
+            // Collision boundary push
+            const centerDist = Math.abs((player.x + pWidth/2) - (enemy.x + eWidth/2));
+            const minAllowed = (pWidth + eWidth) * 0.35;
+
+            if (centerDist < minAllowed && !isDragon) {
+                if (player.x < enemy.x) { player.x -= 2; enemy.x += 2; } 
+                else { player.x += 2; enemy.x -= 2; }
+            }
 
             pEl.style.transform = `translate(${player.x}px, ${player.y}px)`;
             eEl.style.transform = `translate(${enemy.x}px, ${enemy.y}px)`;
@@ -640,25 +688,39 @@
             window.requestAnimationFrame(updateFrameLoop);
         }
 
-        function processEnemyAI() {
+        function processEnemyAI(isDragon) {
             const ai = levelData[state.currentLevel];
             let spd = ai.aiSpeed; let atkInt = 1400; let projChance = 0.02;
-            if (state.difficulty === 'easy') { spd *= 0.4; atkInt = 2600; projChance = 0.005; } 
-            else if (state.difficulty === 'hard') { spd *= 1.35; atkInt = 750; projChance = 0.05; }
+            if (state.difficulty === 'easy') { spd *= 0.45; atkInt = 2400; projChance = 0.005; } 
+            else if (state.difficulty === 'hard') { spd *= 1.4; atkInt = 750; projChance = 0.045; }
 
-            const dist = enemy.x - player.x;
+            const dist = Math.abs(enemy.x - player.x);
 
-            if (!enemy.isAttacking) {
-                if(dist > (state.currentLevel === 4 ? 120 : 70)) enemy.x -= spd;
-                else if (dist < (state.currentLevel === 4 ? 90 : 55)) enemy.x += spd;
+            // Dragon independent glide module
+            if (isDragon) {
+                enemy.dragonAngle += 0.04;
+                enemy.y = -70 + Math.sin(enemy.dragonAngle) * 30; // Hover
+                
+                const targetX = player.x + 40;
+                if (enemy.x > targetX + 40) enemy.x -= spd * 1.1;
+                else if (enemy.x < targetX - 40) enemy.x += spd * 1.1;
+            } else {
+                if (!enemy.isAttacking) {
+                    if(dist > 85) enemy.x -= spd;
+                    else if (dist < 60) enemy.x += spd;
+                }
             }
-            if(enemy.x > config.width - 90) enemy.x = config.width - 90;
+
+            if(enemy.x < 0) enemy.x = 0;
+            if(enemy.x > config.width - 120) enemy.x = config.width - 120;
 
             const now = Date.now();
-            if(dist <= 150 && (now - enemy.lastAttackTime > atkInt)) {
-                performEnemyAttack(dist);
+            let meleeRangeCheck = isDragon ? 150 : 100;
+            
+            if(dist <= meleeRangeCheck && (now - enemy.lastAttackTime > atkInt)) {
+                performEnemyAttack(dist, isDragon);
             }
-            else if (dist > 180 && now - enemy.lastProj > 2000 && Math.random() < projChance) {
+            else if (dist > 180 && now - enemy.lastProj > 2200 && Math.random() < projChance) {
                 fireProjectile(false);
             }
         }
@@ -667,10 +729,9 @@
             const now = Date.now();
             const source = isPlayer ? player : enemy;
             if(source.isAttacking || source.isBlocking || source.isDucking) return;
-            if(isPlayer && now - player.lastProj < 1000) return;
+            if(isPlayer && now - player.lastProj < 800) return; 
             
             source.isAttacking = true; source.lastProj = now;
-            
             let isHeavyBoss = !isPlayer && state.currentLevel === 4;
             soundFx('throw', isHeavyBoss);
             
@@ -678,20 +739,24 @@
             el.classList.add('anim-throw');
 
             const symbol = isPlayer ? charData[state.playerCharKey].proj : levelData[state.currentLevel].proj;
-            const px = isPlayer ? source.x + 50 : source.x;
-            const py = 300 + source.y;
+            const px = isPlayer ? source.x + 55 : source.x - 15;
+            const py = 310 + source.y; 
 
             const pDiv = document.createElement('div');
             pDiv.className = 'projectile'; pDiv.innerText = symbol;
+            
+            // Fix absolute positioning tracking
+            pDiv.style.left = '0'; pDiv.style.top = '0';
+            
             document.getElementById('projectile-layer').appendChild(pDiv);
 
             state.activeProjectiles.push({
                 isPlayer: isPlayer, x: px, y: py,
-                vx: isPlayer ? 10 : -10,
+                vx: isPlayer ? 12 : -12,
                 el: pDiv, active: true
             });
 
-            setTimeout(() => { el.classList.remove('anim-throw'); source.isAttacking = false; }, 300);
+            setTimeout(() => { el.classList.remove('anim-throw'); source.isAttacking = false; }, 280);
         }
 
         function processProjectiles() {
@@ -704,104 +769,117 @@
                 const tx = target.x;
                 
                 let hit = false;
-                if(p.isPlayer && p.x > tx && p.x < tx + 50) hit = true;
-                if(!p.isPlayer && p.x < tx + 50 && p.x > tx) hit = true;
+                if(p.isPlayer && p.x > tx && p.x < tx + 80) hit = true;
+                if(!p.isPlayer && p.x < tx + 70 && p.x > tx) hit = true;
 
                 if(hit) {
                     p.active = false; p.el.remove();
-                    let targetIsDragon = (!p.isPlayer && state.currentLevel === 4);
                     
-                    if(!p.isPlayer && player.isDucking) return; 
-                    if(!p.isPlayer && player.isBlocking) { soundFx('block', targetIsDragon); target.health -= 2; }
-                    else {
-                        soundFx('hit', targetIsDragon || p.isPlayer && state.currentLevel === 4); target.health -= 15;
-                        const tel = document.getElementById(p.isPlayer ? 'enemy' : 'player');
-                        tel.classList.add('hit-flash'); setTimeout(() => tel.classList.remove('hit-flash'), 120);
+                    if(!p.isPlayer && player.isDucking) return; // Duck to dodge
+                    
+                    const tel = document.getElementById(p.isPlayer ? 'enemy' : 'player');
+                    let targetIsDragon = (!p.isPlayer && state.currentLevel === 4);
+
+                    if(!p.isPlayer && player.isBlocking) { 
+                        soundFx('block', targetIsDragon); 
+                        target.health -= 3; 
+                    } else {
+                        soundFx('hit', targetIsDragon); 
+                        target.health -= targetIsDragon ? 20 : 14; // Higher damage from boss
+                        tel.classList.add('hit-target-glow'); 
+                        setTimeout(() => tel.classList.remove('hit-target-glow'), 120);
                         if(p.isPlayer) state.score += 15 * (state.difficulty === 'hard' ? 3 : 1);
                     }
                     checkMatch();
-                } else if (p.x < -50 || p.x > config.width + 50) {
+                } else if (p.x < -80 || p.x > config.width + 80) {
                     p.active = false; p.el.remove();
                 }
             });
             state.activeProjectiles = state.activeProjectiles.filter(p => p.active);
         }
 
-        // Proximity-Gated Hitbox Melee Module
+        // Proximity-Gated Hitboxes
         function performAttack(type) {
             if(!state.gameActive || player.isAttacking || player.isDucking || player.isBlocking) return;
             player.isAttacking = true;
-            const pEl = document.getElementById('player'); pEl.classList.add(`anim-${type}`);
             
+            const pEl = document.getElementById('player'); 
+            pEl.classList.add(`anim-${type}`);
             soundFx(type.replace('-', ''));
 
-            const dist = Math.abs(enemy.x - player.x);
-            let rng = 70; 
-            if(type === 'big-punch') rng = 95;
-            if(state.playerCharKey === 'dom') rng *= 1.2;
-            if(state.playerCharKey === 'spaniard') rng *= 0.6;
+            // Scaling distance checks
+            const pScale = charData[state.playerCharKey].scale;
+            const eScale = levelData[state.currentLevel].scale;
+            const dist = Math.abs((enemy.x + (45 * eScale)) - (player.x + (45 * pScale)));
+            
+            let strikeMax = 80 * pScale * eScale;
+            if(type === 'big-punch' || type === 'kick') strikeMax = 110 * pScale * eScale;
 
-            if(dist <= rng) {
-                let dmg = type === 'big-punch' ? 22 : (type === 'kick' ? 14 : 10);
+            if(dist <= strikeMax) {
+                let dmg = type === 'big-punch' ? 24 : (type === 'kick' ? 15 : 10);
                 enemy.health -= dmg;
                 state.score += dmg * (state.difficulty === 'hard' ? 3 : state.difficulty === 'medium' ? 2 : 1);
+                
                 soundFx('hit', state.currentLevel === 4);
-                const eEl = document.getElementById('enemy'); eEl.classList.add('hit-flash');
-                setTimeout(() => eEl.classList.remove('hit-flash'), 120);
+                const eEl = document.getElementById('enemy'); 
+                eEl.classList.add('hit-target-glow');
+                setTimeout(() => eEl.classList.remove('hit-target-glow'), 120);
             }
 
-            setTimeout(() => { pEl.classList.remove(`anim-${type}`); player.isAttacking = false; checkMatch(); }, type === 'big-punch' ? 350 : 220);
+            setTimeout(() => { pEl.classList.remove(`anim-${type}`); player.isAttacking = false; checkMatch(); }, type === 'big-punch' ? 360 : 220);
         }
 
-        // Proximity-Gated Enemy Strike Logic
-        function performEnemyAttack(dist) {
+        function performEnemyAttack(dist, isDragon) {
             enemy.lastAttackTime = Date.now(); enemy.isAttacking = true;
             const eEl = document.getElementById('enemy');
             
-            let atkType = Math.random() > 0.6 ? 'anim-kick' : 'anim-punch';
-            if((state.currentLevel === 3 || state.currentLevel === 4) && Math.random() > 0.6) atkType = 'anim-big-punch';
+            let atkType = Math.random() > 0.65 ? 'anim-kick' : 'anim-punch';
+            if((state.currentLevel >= 3) && Math.random() > 0.5) atkType = 'anim-big-punch';
             
             eEl.classList.add(atkType);
-            let isHeavyBoss = (state.currentLevel === 4);
-            soundFx(atkType.includes('big') ? 'bigpunch' : (atkType.includes('kick') ? 'kick' : 'punch'), isHeavyBoss);
+            soundFx(atkType.includes('big') ? 'bigpunch' : (atkType.includes('kick') ? 'kick' : 'punch'), isDragon);
 
-            let rng = 75;
-            if(atkType === 'anim-big-punch') rng = 100;
-            if(state.currentLevel === 4) rng *= 1.8;
+            let strikeMax = isDragon ? 160 : 100;
+            if(atkType === 'anim-big-punch') strikeMax += 20;
 
-            if(dist <= rng) {
+            if(dist <= strikeMax) {
                 if (player.isDucking && atkType !== 'anim-kick') {} 
                 else {
-                    let bdmg = state.currentLevel === 4 ? 20 : (state.currentLevel === 3 ? 16 : 11);
-                    if(atkType === 'anim-big-punch') bdmg = 25;
-                    if(state.difficulty === 'easy') bdmg *= 0.45; if(state.difficulty === 'hard') bdmg *= 1.5;
+                    let bdmg = isDragon ? 20 : 12;
+                    if(atkType === 'anim-big-punch') bdmg *= 1.5;
                     
-                    if (player.isBlocking) { bdmg *= 0.15; soundFx('block', isHeavyBoss); } 
-                    else {
-                        soundFx('hit', isHeavyBoss); const pEl = document.getElementById('player');
-                        pEl.classList.add('hit-flash'); setTimeout(() => pEl.classList.remove('hit-flash'), 120);
+                    if(state.difficulty === 'easy') bdmg *= 0.45; if(state.difficulty === 'hard') bdmg *= 1.45;
+                    
+                    if (player.isBlocking) { 
+                        bdmg *= 0.15; soundFx('block', isDragon); 
+                    } else {
+                        soundFx('hit', isDragon); 
+                        const pEl = document.getElementById('player');
+                        pEl.classList.add('hit-target-glow'); setTimeout(() => pEl.classList.remove('hit-target-glow'), 120);
                     }
-                    player.health -= Math.round(bdmg);
+                    player.health -= Math.max(1, Math.round(bdmg));
                 }
             }
-            setTimeout(() => { eEl.classList.remove(atkType); enemy.isAttacking = false; checkMatch(); }, 250);
+            setTimeout(() => { eEl.classList.remove(atkType); enemy.isAttacking = false; checkMatch(); }, 260);
         }
 
         function updateVisuals() {
             document.getElementById('player-fill').style.width = `${Math.max(0, player.health)}%`;
-            const mHp = levelData[state.currentLevel].health;
-            document.getElementById('enemy-fill').style.width = `${Math.max(0, (enemy.health / mHp) * 100)}%`;
+            const maxHp = levelData[state.currentLevel].health;
+            document.getElementById('enemy-fill').style.width = `${Math.max(0, (enemy.health / maxHp) * 100)}%`;
         }
 
         function checkMatch() {
             updateVisuals();
-            if(player.health <= 0) { playTone(150, 'sawtooth', 0.8, 0.5, 40); endGame(false, "YOU LOSE"); }
-            else if(enemy.health <= 0) {
-                if(state.currentLevel < 4) {
-                    playTone(400, 'sine', 0.4, 0.3, 600);
+            if(player.health <= 0) { 
+                playTone(130, 'sawtooth', 0.8, 0.5, 40); endGame(false, "YOU LOSE"); 
+            } else if(enemy.health <= 0) {
+                const totalLevels = Object.keys(levelData).length;
+                if(state.currentLevel < totalLevels) {
+                    playTone(420, 'sine', 0.3, 0.3, 650);
                     state.currentLevel++; setupLevel(state.currentLevel);
                 } else {
-                    playTone(300, 'sine', 0.2, 0.4, 500); setTimeout(() => playTone(500, 'sine', 0.5, 0.4, 900), 150);
+                    playTone(350, 'sine', 0.2, 0.4, 550); setTimeout(() => playTone(550, 'sine', 0.6, 0.4, 950), 150);
                     endGame(true, "CHAMPION VICTORY!");
                 }
             }
@@ -818,15 +896,15 @@
         }
 
         function showLeaderboardInput() {
-            let initials = prompt("Enter your name:", "PLAYER");
+            let initials = prompt("Enter your name:", "EL DOMO");
             if (!initials) initials = "UNKNOWN";
-            leaderboard.push({ name: initials.substring(0,10).toUpperCase(), level: state.currentLevel, score: state.score, diff: state.difficulty.toUpperCase() });
+            leaderboard.push({ name: initials.substring(0,12).toUpperCase(), level: state.currentLevel, score: state.score });
             leaderboard.sort((a,b) => b.score - a.score);
             
             const tbody = document.getElementById('leaderboard-body'); tbody.innerHTML = "";
-            leaderboard.forEach((r,i) => {
+            leaderboard.forEach((r, i) => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>#${i+1}</td><td>${r.name}</td><td>Lv ${r.level}</td><td style="color:#ffd700;">${r.score}</td>`;
+                tr.innerHTML = `<td>#${i+1}</td><td>${r.name}</td><td>Lv ${r.level}</td><td style="color:#ffd700; font-weight:bold;">${r.score}</td>`;
                 tbody.appendChild(tr);
             });
             showScreen('leaderboard-screen');
@@ -836,3 +914,5 @@
     </script>
 </body>
 </html>
+
+```
